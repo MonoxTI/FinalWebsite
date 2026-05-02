@@ -10,6 +10,7 @@ export default function AdminDashboard() {
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     if (!user) return
@@ -36,7 +37,6 @@ export default function AdminDashboard() {
     const msg = action === "approve"
       ? `Approve "${username}"? They will gain dashboard access.`
       : `Revoke access for "${username}"? They will return to pending.`
-
     if (!window.confirm(msg)) return
 
     try {
@@ -49,21 +49,16 @@ export default function AdminDashboard() {
         },
         body: JSON.stringify({ action }),
       })
-
       const data = await res.json()
       if (!res.ok) throw new Error(data.message)
 
-      setSuccess(
-        action === "approve"
-          ? `✅ ${username} approved successfully`
-          : `🔒 ${username}'s access revoked`
+      setSuccess(action === "approve"
+        ? `✅ ${username} approved`
+        : `🔒 ${username} revoked`
       )
-
-      // ── Remove from pending list if approved ─────────
       if (action === "approve") {
         setPendingUsers(prev => prev.filter(u => u._id !== userId))
       }
-
       setTimeout(() => setSuccess(""), 3000)
     } catch (err) {
       setError(err.message)
@@ -71,28 +66,60 @@ export default function AdminDashboard() {
     }
   }
 
-  const formatDate = (str) =>
-    str
-      ? new Date(str).toLocaleDateString("en-ZA", {
-          year: "numeric", month: "short", day: "numeric",
-        })
-      : "—"
+  // ── Delete ALL appointments ──────────────────────────
+  const handleDeleteAll = async () => {
+    const confirmed = window.confirm(
+      "Delete ALL appointments? This cannot be undone."
+    )
+    if (!confirmed) return
+
+    const typed = window.prompt(
+      'Type "DELETE ALL" to confirm:'
+    )
+    if (typed !== "DELETE ALL") {
+      alert("Incorrect. Deletion cancelled.")
+      return
+    }
+
+    setDeleting(true)
+    try {
+      const token = localStorage.getItem("token")
+      const res = await fetch("/api/appointments", {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.message)
+      setSuccess("🗑 All appointments deleted")
+      setTimeout(() => setSuccess(""), 3000)
+    } catch (err) {
+      setError(err.message)
+      setTimeout(() => setError(""), 4000)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const formatDate = (str) => str
+    ? new Date(str).toLocaleDateString("en-ZA", {
+        year: "numeric", month: "short", day: "numeric",
+      })
+    : "—"
 
   if (loading || fetching) return <LoadingScreen />
 
   return (
     <main style={{
-      minHeight: "100vh",
-      background: "#f0f4ff",
-      paddingTop: 80,
-      fontFamily: "'Barlow', sans-serif",
+      minHeight: "100vh", background: "#f0f4ff",
+      paddingTop: 80, fontFamily: "'Barlow', sans-serif",
     }}>
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "2rem 1.5rem" }}>
 
         {/* Header */}
         <div style={{
           display: "flex", justifyContent: "space-between",
-          alignItems: "flex-start", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem",
+          alignItems: "flex-start", marginBottom: "2rem",
+          flexWrap: "wrap", gap: "1rem",
         }}>
           <div>
             <h1 style={{
@@ -119,10 +146,76 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        {/* Pending count card */}
+        {/* ── Quick action buttons ───────────────────── */}
         <div style={{
-          background: "#fff",
-          border: "1px solid #e5e7eb",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "1rem", marginBottom: "2rem",
+        }}>
+
+          {/* Go to Tutor Dashboard */}
+          <button
+            onClick={() => router.push("/dashboard/tutor")}
+            style={{
+              background: "#fff",
+              border: "1px solid #e5e7eb",
+              borderLeft: "4px solid #2563b8",
+              borderRadius: 8, padding: "1.25rem 1.5rem",
+              textAlign: "left", cursor: "pointer",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+              transition: "box-shadow 0.2s",
+            }}
+            onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 12px rgba(37,99,184,0.15)"}
+            onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)"}
+          >
+            <div style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 800, fontSize: "0.95rem",
+              textTransform: "uppercase", color: "#0a1628",
+              marginBottom: "0.25rem",
+            }}>
+              📋 Tutor Dashboard
+            </div>
+            <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+              View appointments and session details
+            </div>
+          </button>
+
+          {/* Delete all appointments */}
+          <button
+            onClick={handleDeleteAll}
+            disabled={deleting}
+            style={{
+              background: "#fff",
+              border: "1px solid #e5e7eb",
+              borderLeft: "4px solid #ef4444",
+              borderRadius: 8, padding: "1.25rem 1.5rem",
+              textAlign: "left",
+              cursor: deleting ? "not-allowed" : "pointer",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+              transition: "box-shadow 0.2s",
+              opacity: deleting ? 0.6 : 1,
+            }}
+            onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 12px rgba(239,68,68,0.15)"}
+            onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)"}
+          >
+            <div style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 800, fontSize: "0.95rem",
+              textTransform: "uppercase", color: "#ef4444",
+              marginBottom: "0.25rem",
+            }}>
+              🗑 {deleting ? "Deleting..." : "Delete All Appointments"}
+            </div>
+            <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+              Permanently removes all bookings
+            </div>
+          </button>
+        </div>
+
+        {/* Stats */}
+        <div style={{
+          background: "#fff", border: "1px solid #e5e7eb",
           borderLeft: "4px solid #f59e0b",
           borderRadius: 8, padding: "1.25rem 2rem",
           marginBottom: "2rem", display: "inline-block",
@@ -144,9 +237,8 @@ export default function AdminDashboard() {
             background: success ? "#f0fdf4" : "#fef2f2",
             border: `1px solid ${success ? "#bbf7d0" : "#fecaca"}`,
             color: success ? "#15803d" : "#b91c1c",
-            padding: "1rem 1.25rem",
-            borderRadius: 6, fontSize: "0.875rem",
-            marginBottom: "1.5rem",
+            padding: "1rem 1.25rem", borderRadius: 6,
+            fontSize: "0.875rem", marginBottom: "1.5rem",
           }}>
             {success || error}
           </div>
@@ -154,10 +246,8 @@ export default function AdminDashboard() {
 
         {/* Pending users table */}
         <div style={{
-          background: "#fff",
-          border: "1px solid #e5e7eb",
-          borderRadius: 8,
-          overflow: "hidden",
+          background: "#fff", border: "1px solid #e5e7eb",
+          borderRadius: 8, overflow: "hidden",
         }}>
           <div style={{
             padding: "1rem 1.5rem",
@@ -204,10 +294,7 @@ export default function AdminDashboard() {
                   </thead>
                   <tbody>
                     {pendingUsers.map(u => (
-                      <tr
-                        key={u._id}
-                        style={{ borderBottom: "1px solid #f3f4f6" }}
-                      >
+                      <tr key={u._id} style={{ borderBottom: "1px solid #f3f4f6" }}>
                         <td style={{ padding: "0.85rem 0", fontWeight: 600, color: "#111" }}>
                           {u.username}
                         </td>
@@ -221,9 +308,8 @@ export default function AdminDashboard() {
                           <button
                             onClick={() => handleAction(u._id, u.username, "approve")}
                             style={{
-                              background: "#16a34a", color: "#fff",
-                              border: "none", padding: "0.45rem 1rem",
-                              borderRadius: 4, cursor: "pointer",
+                              background: "#16a34a", color: "#fff", border: "none",
+                              padding: "0.45rem 1rem", borderRadius: 4, cursor: "pointer",
                               fontFamily: "'Barlow Condensed', sans-serif",
                               fontWeight: 700, fontSize: "0.8rem",
                               letterSpacing: "0.06em", marginRight: "0.5rem",
@@ -234,9 +320,8 @@ export default function AdminDashboard() {
                           <button
                             onClick={() => handleAction(u._id, u.username, "revoke")}
                             style={{
-                              background: "#f3f4f6", color: "#374151",
-                              border: "none", padding: "0.45rem 1rem",
-                              borderRadius: 4, cursor: "pointer",
+                              background: "#f3f4f6", color: "#374151", border: "none",
+                              padding: "0.45rem 1rem", borderRadius: 4, cursor: "pointer",
                               fontFamily: "'Barlow Condensed', sans-serif",
                               fontWeight: 700, fontSize: "0.8rem",
                               letterSpacing: "0.06em",
@@ -254,15 +339,12 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Tip */}
         <div style={{
-          marginTop: "1.5rem",
-          background: "#eff6ff",
-          border: "1px solid #bfdbfe",
-          borderRadius: 6, padding: "1rem 1.25rem",
-          fontSize: "0.85rem", color: "#1d4ed8",
+          marginTop: "1.5rem", background: "#eff6ff",
+          border: "1px solid #bfdbfe", borderRadius: 6,
+          padding: "1rem 1.25rem", fontSize: "0.85rem", color: "#1d4ed8",
         }}>
-          💡 <strong>Tip:</strong> Approved tutors can immediately log in and view appointments. Revoked users return to pending status.
+          💡 <strong>Tip:</strong> Approved tutors can immediately log in and view appointments.
         </div>
       </div>
     </main>
@@ -279,8 +361,8 @@ function LoadingScreen() {
       <div style={{ textAlign: "center", fontFamily: "'Barlow', sans-serif" }}>
         <div style={{
           width: 48, height: 48, border: "3px solid #e5e7eb",
-          borderTop: "3px solid #2563b8",
-          borderRadius: "50%", margin: "0 auto 1rem",
+          borderTop: "3px solid #2563b8", borderRadius: "50%",
+          margin: "0 auto 1rem",
           animation: "spin 0.8s linear infinite",
         }} />
         <p style={{ color: "#6b7280" }}>Loading...</p>

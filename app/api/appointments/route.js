@@ -66,3 +66,24 @@ export async function GET(req) {
 
   return Response.json({ success: true, data: appointments });
 }
+
+/* ── DELETE /api/appointments ────────────────────
+   Admin only — deletes every appointment          */
+export async function DELETE(req) {
+  const user = await getAuthUser(req)
+  if (!user) return unauthorized()
+
+  // ── Only admins can delete everything ───────────
+  if (!user.isAdmin()) {
+    return forbidden("Admin access required")
+  }
+
+  await connectDB()
+
+  await AppointmentModel.deleteMany({})
+
+  return Response.json({
+    success: true,
+    message: "All appointments deleted",
+  })
+}
