@@ -105,31 +105,7 @@ export default function HomePage() {
             Making Education Fashionable
           </p>
 
-          <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-            <Link href="/appointments" className="btn-primary" style={{
-              background: "#2563b8", color: "#fff",
-              padding: "0.95rem 2.5rem",
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 800, fontSize: "0.95rem",
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              borderRadius: 4, textDecoration: "none",
-              display: "inline-block",
-            }}>
-              BOOK A SESSION
-            </Link>
-            <Link href="/services" className="btn-secondary" style={{
-              background: "transparent", color: "#fff",
-              border: "1.5px solid rgba(255,255,255,0.4)",
-              padding: "0.95rem 2.5rem",
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 700, fontSize: "0.9rem",
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              borderRadius: 4, textDecoration: "none",
-              display: "inline-block",
-            }}>
-              VIEW SERVICES
-            </Link>
-          </div>
+         
         </div>
 
         {/* Logo watermark — top right */}
@@ -155,14 +131,6 @@ export default function HomePage() {
         padding: "clamp(4rem,8vw,7rem) clamp(1.5rem,6vw,5rem)",
       }}>
         <div style={{ maxWidth: 780 }}>
-          <div style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700, fontSize: "0.72rem",
-            letterSpacing: "0.2em", textTransform: "uppercase",
-            color: "#2563b8", marginBottom: "0.5rem",
-          }}>
-            Our Philosophy
-          </div>
           <h2 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 900,
@@ -211,14 +179,6 @@ export default function HomePage() {
           maxWidth: 1100,
         }}>
           <div>
-            <div style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 700, fontSize: "0.72rem",
-              letterSpacing: "0.2em", textTransform: "uppercase",
-              color: "#60a5fa", marginBottom: "0.5rem",
-            }}>
-              Meet the Team
-            </div>
             <h2 style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 900,
@@ -432,20 +392,6 @@ export default function HomePage() {
                 <span>{item.perLesson}</span>
               </div>
             ))}
-          </div>
-
-          <div style={{ marginTop: "2.5rem" }}>
-            <Link href="/services" className="btn-primary" style={{
-              background: "#2563b8", color: "#fff",
-              padding: "0.95rem 2.5rem",
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 800, fontSize: "0.95rem",
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              borderRadius: 4, textDecoration: "none",
-              display: "inline-block",
-            }}>
-              VIEW FULL SERVICES →
-            </Link>
           </div>
         </div>
       </section>
