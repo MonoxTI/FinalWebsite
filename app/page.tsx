@@ -2,10 +2,25 @@
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import Link from "next/link"
+import Image from "next/image"
 
 export default function HomePage() {
   return (
     <>
+      {/* ── PSEUDO-CLASSES & ACCESSIBILITY ────────────── */}
+      <style>{`
+        .btn-primary:hover { background: #1d4ed8 !important; }
+        .btn-secondary:hover { border-color: rgba(255,255,255,0.8) !important; background: rgba(255,255,255,0.05) !important; }
+        .btn-primary:focus-visible, .btn-secondary:focus-visible {
+          outline: 2px solid #60a5fa;
+          outline-offset: 2px;
+        }
+        .pricing-row:hover { background: rgba(59,130,246,0.15) !important; }
+        @media (max-width: 768px) {
+          .grid-responsive { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
+
       <Navbar />
 
       {/* ── SECTION 1: HERO ─────────────────────────────── */}
@@ -62,7 +77,8 @@ export default function HomePage() {
             }}>
               15% OFF
             </span>{" "}
-            <span style={{ fontSize: "1rem", color: "rgba(255,255,255,0.6)" }}>
+            {/* ⬆️ Improved contrast from 0.6 to 0.85 for WCAG AA compliance */}
+            <span style={{ fontSize: "1rem", color: "rgba(255,255,255,0.85)" }}>
               valid only for March
             </span>
           </p>
@@ -90,7 +106,7 @@ export default function HomePage() {
           </p>
 
           <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-            <Link href="/appointments" style={{
+            <Link href="/appointments" className="btn-primary" style={{
               background: "#2563b8", color: "#fff",
               padding: "0.95rem 2.5rem",
               fontFamily: "'Barlow Condensed', sans-serif",
@@ -101,7 +117,7 @@ export default function HomePage() {
             }}>
               BOOK A SESSION
             </Link>
-            <Link href="/services" style={{
+            <Link href="/services" className="btn-secondary" style={{
               background: "transparent", color: "#fff",
               border: "1.5px solid rgba(255,255,255,0.4)",
               padding: "0.95rem 2.5rem",
@@ -125,6 +141,8 @@ export default function HomePage() {
           <img
             src="/images/logo.png"
             alt=""
+            loading="lazy"
+            draggable="false"
             style={{ height: "clamp(200px,35vw,500px)", width: "auto" }}
           />
         </div>
@@ -137,6 +155,14 @@ export default function HomePage() {
         padding: "clamp(4rem,8vw,7rem) clamp(1.5rem,6vw,5rem)",
       }}>
         <div style={{ maxWidth: 780 }}>
+          <div style={{
+            fontFamily: "'Barlow Condensed', sans-serif",
+            fontWeight: 700, fontSize: "0.72rem",
+            letterSpacing: "0.2em", textTransform: "uppercase",
+            color: "#2563b8", marginBottom: "0.5rem",
+          }}>
+            Our Philosophy
+          </div>
           <h2 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 900,
@@ -177,9 +203,10 @@ export default function HomePage() {
         color: "#fff",
         padding: "clamp(4rem,8vw,7rem) clamp(1.5rem,6vw,5rem)",
       }}>
-        <div style={{
+        {/* ⬇️ Responsive grid: stacks on mobile, 2-col on tablet+ */}
+        <div className="grid-responsive" style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))",
           gap: "4rem", alignItems: "center",
           maxWidth: 1100,
         }}>
@@ -232,10 +259,14 @@ export default function HomePage() {
               borderRadius: 12, padding: 8,
               border: "1px solid rgba(59,130,246,0.2)",
             }}>
-              <img
+              {/* ⬆️ Optimized with next/image for automatic WebP/AVIF, lazy loading & sizing */}
+              <Image
                 src="/images/pic1.png"
                 alt="Founder of Assembled Tutoring"
-                style={{ height: 320, width: "auto", objectFit: "contain", borderRadius: 8 }}
+                width={400}
+                height={320}
+                priority
+                style={{ objectFit: "contain", borderRadius: 8 }}
               />
             </div>
             <blockquote style={{
@@ -268,15 +299,22 @@ export default function HomePage() {
             borderRadius: 10, overflow: "hidden",
             boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
           }}>
-            <img
+            <Image
               src="/images/pic2.jpg"
-              alt="Assembled Tutoring Alumni"
+              alt="Assembled Tutoring alumni celebrating academic milestones"
+              width={700}
+              height={400}
+              loading="lazy"
               style={{ width: "100%", height: "auto", display: "block" }}
             />
           </div>
 
           {/* Why sections */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2.5rem", marginBottom: "3rem" }}>
+          <div className="grid-responsive" style={{ 
+            display: "grid", 
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", 
+            gap: "2.5rem", marginBottom: "3rem" 
+          }}>
             {[
               {
                 title: "Why Psychometric Testing?",
@@ -319,9 +357,12 @@ export default function HomePage() {
             borderRadius: 10, overflow: "hidden",
             boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
           }}>
-            <img
+            <Image
               src="/images/pic4.jpg"
-              alt="Additional Services"
+              alt="Assembled Tutoring additional academic support services"
+              width={700}
+              height={400}
+              loading="lazy"
               style={{ width: "100%", height: "auto", display: "block" }}
             />
           </div>
@@ -346,26 +387,45 @@ export default function HomePage() {
           </h2>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+            {/* ⬆️ Separated header from rows to remove fragile `i === 0` logic */}
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 2fr 1.5fr",
+              alignItems: "center",
+              background: "transparent",
+              border: "1px solid rgba(59,130,246,0.4)",
+              borderRadius: 6, padding: "1rem 1.5rem",
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 700,
+              fontSize: "0.75rem",
+              letterSpacing: "0.12em",
+              color: "rgba(147,197,253,0.9)",
+              textTransform: "uppercase",
+            }}>
+              <span>GRADE</span>
+              <span>Monthly Subscription: 2 hrs/week (4 sessions)</span>
+              <span>Rate per lesson (2 hrs)</span>
+            </div>
+
             {[
-              { grade: "", monthly: "Monthly Subscription: 2 hrs/week (4 sessions)", perLesson: "Rate per lesson (2 hrs)" },
               { grade: "GRADE 4–7",   monthly: "R1 500", perLesson: "R500" },
               { grade: "GRADE 8–9",   monthly: "R1 800", perLesson: "R600" },
               { grade: "GRADE 10",    monthly: "R2 000", perLesson: "R650" },
               { grade: "GRADE 11–12", monthly: "R2 300", perLesson: "R700" },
             ].map((item, i) => (
-              <div key={i} style={{
+              <div key={i} className="pricing-row" style={{
                 display: "grid",
                 gridTemplateColumns: "1fr 2fr 1.5fr",
                 alignItems: "center",
-                background: i === 0 ? "transparent" : "rgba(0,0,0,0.25)",
-                border: `1px solid ${i === 0 ? "rgba(59,130,246,0.4)" : "rgba(59,130,246,0.2)"}`,
+                background: "rgba(0,0,0,0.25)",
+                border: "1px solid rgba(59,130,246,0.2)",
                 borderRadius: 6, padding: "1rem 1.5rem",
                 fontFamily: "'Barlow Condensed', sans-serif",
-                fontWeight: i === 0 ? 700 : 600,
-                fontSize: i === 0 ? "0.75rem" : "1.05rem",
-                letterSpacing: i === 0 ? "0.12em" : "0.02em",
-                color: i === 0 ? "rgba(147,197,253,0.9)" : "#fff",
-                textTransform: i === 0 ? "uppercase" : "none",
+                fontWeight: 600,
+                fontSize: "1.05rem",
+                letterSpacing: "0.02em",
+                color: "#fff",
+                textTransform: "none",
               }}>
                 <span>{item.grade}</span>
                 <span>{item.monthly}</span>
@@ -375,7 +435,7 @@ export default function HomePage() {
           </div>
 
           <div style={{ marginTop: "2.5rem" }}>
-            <Link href="/services" style={{
+            <Link href="/services" className="btn-primary" style={{
               background: "#2563b8", color: "#fff",
               padding: "0.95rem 2.5rem",
               fontFamily: "'Barlow Condensed', sans-serif",
