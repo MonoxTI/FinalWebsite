@@ -137,14 +137,6 @@ export default function HomePage() {
         padding: "clamp(4rem,8vw,7rem) clamp(1.5rem,6vw,5rem)",
       }}>
         <div style={{ maxWidth: 780 }}>
-          <div style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700, fontSize: "0.72rem",
-            letterSpacing: "0.2em", textTransform: "uppercase",
-            color: "#2563b8", marginBottom: "0.5rem",
-          }}>
-            Our Philosophy
-          </div>
           <h2 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 900,

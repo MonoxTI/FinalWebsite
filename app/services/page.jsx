@@ -188,19 +188,7 @@ export default function ServicesPage() {
             ))}
           </div>
 
-          <div style={{ marginTop: "3rem", textAlign: "center" }}>
-            <Link href="/appointments" style={{
-              background: "#1e3a7a", color: "#fff",
-              padding: "0.95rem 2.5rem",
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 800, fontSize: "0.95rem",
-              letterSpacing: "0.12em", textTransform: "uppercase",
-              borderRadius: 4, textDecoration: "none",
-              display: "inline-block",
-            }}>
-              BOOK A SESSION →
-            </Link>
-          </div>
+          
         </div>
       </section>
 
