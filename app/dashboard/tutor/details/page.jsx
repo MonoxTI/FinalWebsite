@@ -97,7 +97,7 @@ export default function AppointmentDetailsPage() {
       }
 
       // ── Fetch payment details for this appointment ───
-      const detailRes = await fetch(`/api/appointments/${match._id}`, {
+      const detailRes = await fetch(`/api/appointments/${match._id.toString()}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const detailJson = await detailRes.json()
@@ -123,7 +123,7 @@ export default function AppointmentDetailsPage() {
     setUpdating(true)
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch(`/api/appointments/${data.appointment.id}`, {
+      const res = await fetch(`/api/appointments/${data.appointment.id || data.appointment._id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

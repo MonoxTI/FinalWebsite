@@ -27,28 +27,26 @@ export async function GET(req, { params }) {
     appointmentId: appointment._id,
   }).lean()
 
-  return Response.json({
-    success: true,
-    data: {
-      appointment: {
-        id: appointment._id,
-        fullName: appointment.fullName,
-        email: appointment.email,
-        phoneNumber: appointment.phoneNumber,
-        chapters: appointment.chapters || "",
-        createdAt: appointment.createdAt,
-      },
-      paymentDetails: paymentDetails
-        ? {
-            paymentStatus: paymentDetails.PaymentStatus,
-            transactionId: paymentDetails.TransactionID,
-            amountPaid: paymentDetails.AmountPaid,
-            invoiceNumber: paymentDetails.invoiceNumber,
-            note: paymentDetails.Note,
-          }
-        : null,
+return Response.json({
+  success: true,
+  data: {
+    appointment: {
+      id: appointment._id.toString(), // ← must be string
+      fullName: appointment.fullName,
+      email: appointment.email,
+      phoneNumber: appointment.phoneNumber,
+      chapters: appointment.chapters || "",
+      createdAt: appointment.createdAt,
     },
-  })
+    paymentDetails: paymentDetails ? {
+      paymentStatus: paymentDetails.PaymentStatus,
+      amountPaid: paymentDetails.AmountPaid,
+      transactionId: paymentDetails.TransactionID,
+      invoiceNumber: paymentDetails.invoiceNumber,
+      note: paymentDetails.Note,
+    } : null,
+  },
+})
 }
 
 /* ── PATCH /api/appointments/:id ─────────────────

@@ -68,37 +68,35 @@ export default function AdminDashboard() {
 
   // ── Delete ALL appointments ──────────────────────────
   const handleDeleteAll = async () => {
-    const confirmed = window.confirm(
-      "Delete ALL appointments? This cannot be undone."
-    )
-    if (!confirmed) return
+  const confirmed = window.confirm(
+    "Delete ALL appointments? This cannot be undone."
+  )
+  if (!confirmed) return
 
-    const typed = window.prompt(
-      'Type "DELETE ALL" to confirm:'
-    )
-    if (typed !== "DELETE ALL") {
-      alert("Incorrect. Deletion cancelled.")
-      return
-    }
-
-    setDeleting(true)
-    try {
-      const token = localStorage.getItem("token")
-      const res = await fetch("/api/appointments", {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.message)
-      setSuccess("🗑 All appointments deleted")
-      setTimeout(() => setSuccess(""), 3000)
-    } catch (err) {
-      setError(err.message)
-      setTimeout(() => setError(""), 4000)
-    } finally {
-      setDeleting(false)
-    }
+  const typed = window.prompt('Type "DELETE ALL" to confirm:')
+  if (typed !== "DELETE ALL") {
+    alert("Incorrect. Deletion cancelled.")
+    return
   }
+
+  setDeleting(true)
+  try {
+    const token = localStorage.getItem("token")
+    const res = await fetch("/api/appointments", {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message)
+    setSuccess("🗑 All appointments deleted successfully")
+    setTimeout(() => setSuccess(""), 3000)
+  } catch (err) {
+    setError(err.message)
+    setTimeout(() => setError(""), 4000)
+  } finally {
+    setDeleting(false)
+  }
+}
 
   const formatDate = (str) => str
     ? new Date(str).toLocaleDateString("en-ZA", {
@@ -146,72 +144,64 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-        {/* ── Quick action buttons ───────────────────── */}
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: "1rem", marginBottom: "2rem",
-        }}>
+        {/* ── Quick actions ─────────────────────────── */}
+<div style={{
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+  gap: "1rem", marginBottom: "2rem",
+}}>
+  <button
+    onClick={() => router.push("/dashboard/tutor")}
+    style={{
+      background: "#fff",
+      border: "1px solid #e5e7eb",
+      borderLeft: "4px solid #2563b8",
+      borderRadius: 8, padding: "1.25rem 1.5rem",
+      textAlign: "left", cursor: "pointer",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+    }}
+  >
+    <div style={{
+      fontFamily: "'Barlow Condensed', sans-serif",
+      fontWeight: 800, fontSize: "0.95rem",
+      textTransform: "uppercase", color: "#0a1628",
+      marginBottom: "0.25rem",
+    }}>
+      📋 Tutor Dashboard
+    </div>
+    <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+      View appointments and session details
+    </div>
+  </button>
 
-          {/* Go to Tutor Dashboard */}
-          <button
-            onClick={() => router.push("/dashboard/tutor")}
-            style={{
-              background: "#fff",
-              border: "1px solid #e5e7eb",
-              borderLeft: "4px solid #2563b8",
-              borderRadius: 8, padding: "1.25rem 1.5rem",
-              textAlign: "left", cursor: "pointer",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-              transition: "box-shadow 0.2s",
-            }}
-            onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 12px rgba(37,99,184,0.15)"}
-            onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)"}
-          >
-            <div style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 800, fontSize: "0.95rem",
-              textTransform: "uppercase", color: "#0a1628",
-              marginBottom: "0.25rem",
-            }}>
-              📋 Tutor Dashboard
-            </div>
-            <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
-              View appointments and session details
-            </div>
-          </button>
-
-          {/* Delete all appointments */}
-          <button
-            onClick={handleDeleteAll}
-            disabled={deleting}
-            style={{
-              background: "#fff",
-              border: "1px solid #e5e7eb",
-              borderLeft: "4px solid #ef4444",
-              borderRadius: 8, padding: "1.25rem 1.5rem",
-              textAlign: "left",
-              cursor: deleting ? "not-allowed" : "pointer",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-              transition: "box-shadow 0.2s",
-              opacity: deleting ? 0.6 : 1,
-            }}
-            onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 12px rgba(239,68,68,0.15)"}
-            onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.05)"}
-          >
-            <div style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
-              fontWeight: 800, fontSize: "0.95rem",
-              textTransform: "uppercase", color: "#ef4444",
-              marginBottom: "0.25rem",
-            }}>
-              🗑 {deleting ? "Deleting..." : "Delete All Appointments"}
-            </div>
-            <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
-              Permanently removes all bookings
-            </div>
-          </button>
-        </div>
+  <button
+    onClick={handleDeleteAll}
+    disabled={deleting}
+    style={{
+      background: "#fff",
+      border: "1px solid #e5e7eb",
+      borderLeft: "4px solid #ef4444",
+      borderRadius: 8, padding: "1.25rem 1.5rem",
+      textAlign: "left",
+      cursor: deleting ? "not-allowed" : "pointer",
+      boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+      opacity: deleting ? 0.6 : 1,
+    }}
+  >
+    <div style={{
+      fontFamily: "'Barlow Condensed', sans-serif",
+      fontWeight: 800, fontSize: "0.95rem",
+      textTransform: "uppercase", color: "#ef4444",
+      marginBottom: "0.25rem",
+    }}>
+      🗑 {deleting ? "Deleting..." : "Delete All Appointments"}
+    </div>
+    <div style={{ fontSize: "0.8rem", color: "#6b7280" }}>
+      Permanently removes all bookings
+    </div>
+  </button>
+</div>
+        
 
         {/* Stats */}
         <div style={{
