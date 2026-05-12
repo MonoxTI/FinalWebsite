@@ -115,7 +115,7 @@ export default function HomePage() {
           opacity: 0.08, pointerEvents: "none",
         }}>
           <img
-            src="/images/logo.png"
+            src="/images/LOGO.png"
             alt=""
             loading="lazy"
             draggable="false"

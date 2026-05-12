@@ -77,6 +77,13 @@ export default function Navbar() {
         color: "#fff", letterSpacing: "0.05em",
         textDecoration: "none", whiteSpace: "nowrap",
       }}>
+        <img
+          src="/images/LOGO.png"
+          alt="Assembled Tutoring Logo"
+          style={{ height: 32, marginRight: 8, verticalAlign: "middle" }}
+          loading="lazy"
+          draggable="false"
+        />
         Assembled Tutoring
       </Link>
 
