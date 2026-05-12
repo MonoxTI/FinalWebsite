@@ -104,8 +104,6 @@ export default function HomePage() {
           }}>
             Making Education Fashionable
           </p>
-
-         
         </div>
 
         {/* Logo watermark — top right */}
