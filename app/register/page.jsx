@@ -102,7 +102,7 @@ export default function RegisterPage() {
         backdropFilter: "blur(20px)",
         padding: "3rem", width: "100%", maxWidth: 420, borderRadius: 6,
       }}>
-        <Navbar/>
+        
         <div
           onClick={() => router.push("/")}
           style={{

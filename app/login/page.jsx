@@ -64,7 +64,7 @@ export default function LoginPage() {
         width: "100%", maxWidth: 420,
         borderRadius: 6,
       }}>
-        <Navbar/>
+        
         {/* Logo */}
         <div
           onClick={() => router.push("/")}
@@ -75,7 +75,7 @@ export default function LoginPage() {
             marginBottom: "2rem", cursor: "pointer",
           }}
         >
-          ASSEMBLED<span style={{ color: "#3b82f6" }}>.</span>
+          Assembeled Tutoring
           <span style={{
             fontWeight: 400, fontSize: "0.65rem",
             color: "rgba(255,255,255,0.3)",
