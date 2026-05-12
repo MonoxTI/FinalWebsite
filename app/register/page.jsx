@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Navbar from "@/components/Navbar"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -101,6 +102,7 @@ export default function RegisterPage() {
         backdropFilter: "blur(20px)",
         padding: "3rem", width: "100%", maxWidth: 420, borderRadius: 6,
       }}>
+        <Navbar/>
         <div
           onClick={() => router.push("/")}
           style={{
@@ -109,7 +111,7 @@ export default function RegisterPage() {
             color: "#fff", marginBottom: "2rem", cursor: "pointer",
           }}
         >
-          ASSEMBLED<span style={{ color: "#3b82f6" }}>.</span>
+          Assembled Tutoring
         </div>
 
         <h1 style={{

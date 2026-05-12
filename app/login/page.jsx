@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Navbar from "@/components/Navbar"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -63,7 +64,7 @@ export default function LoginPage() {
         width: "100%", maxWidth: 420,
         borderRadius: 6,
       }}>
-
+        <Navbar/>
         {/* Logo */}
         <div
           onClick={() => router.push("/")}
