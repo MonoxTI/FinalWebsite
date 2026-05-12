@@ -57,14 +57,19 @@ export async function POST(req) {
 /* ─── GET /api/appointments ──────────────────── 
    Protected — only logged-in users with access  */
 export async function GET(req) {
-  const user = await getAuthUser(req);
-  if (!user) return unauthorized();
-  if (!user.hasAccess()) return forbidden("Your account is pending approval");
+  const user = await getAuthUser(req)
+  if (!user) return unauthorized()
+  if (!user.hasAccess()) return forbidden("Account pending approval")
 
-  await connectDB();
-  const appointments = await AppointmentModel.find().sort({ createdAt: -1 });
+  await connectDB()
 
-  return Response.json({ success: true, data: appointments });
+  const appointments = await AppointmentModel.find().sort({ createdAt: -1 })
+
+  // ── Must be a flat array under data ─────────────────
+  return Response.json({
+    success: true,
+    data: appointments,   // ← flat array, not nested
+  })
 }
 
 /* ── DELETE /api/appointments ────────────────────

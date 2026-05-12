@@ -15,25 +15,23 @@ function parseChapters(str) {
 const STATUS_OPTIONS = ["Unpaid", "Partial", "Paid"]
 
 export default function AppointmentDetailsPage() {
-  const { user, loading: authLoading } = useAuth("user")
+  const { user, loading: authLoading } = useAuth()
 
-  // ── Search state ────────────────────────────────────
-  const [options, setOptions] = useState([])          // dropdown names
+  const [options, setOptions] = useState([])
+  const [allAppointments, setAllAppointments] = useState([]) // ← store full objects
   const [selectedName, setSelectedName] = useState("")
   const [searching, setSearching] = useState(false)
   const [searchError, setSearchError] = useState("")
+  const [data, setData] = useState(null)
 
-  // ── Result state ────────────────────────────────────
-  const [data, setData] = useState(null)              // appointment + payment
-
-  // ── Payment update state ────────────────────────────
   const [paymentStatus, setPaymentStatus] = useState("Unpaid")
   const [amount, setAmount] = useState("")
   const [note, setNote] = useState("")
   const [updating, setUpdating] = useState(false)
   const [updateMsg, setUpdateMsg] = useState(null)
 
-  // ── Load names for dropdown on mount ────────────────
+  // ── Load all appointments on mount ───────────────────
+  // We store them locally so we can find the _id when searching
   useEffect(() => {
     if (!user) return
     const loadNames = async () => {
@@ -43,19 +41,29 @@ export default function AppointmentDetailsPage() {
           headers: { Authorization: `Bearer ${token}` },
         })
         const json = await res.json()
-        if (res.ok) {
-          // Deduplicate names for dropdown
-          const names = [...new Set((json.data || []).map((a) => a.fullName))]
-          setOptions(names)
-        }
-      } catch {
+
+        // ── Handle both flat array and nested shapes ──────
+        // json.data could be an array OR { appointments: [] }
+        const list = Array.isArray(json.data)
+          ? json.data
+          : Array.isArray(json.data?.appointments)
+          ? json.data.appointments
+          : []
+
+        console.log("Loaded appointments:", list) // ← debug
+
+        setAllAppointments(list)
+        const names = [...new Set(list.map((a) => a.fullName).filter(Boolean))]
+        setOptions(names)
+      } catch (err) {
+        console.error("Failed to load names:", err)
         setSearchError("Failed to load student names")
       }
     }
     loadNames()
   }, [user])
 
-  // ── Pre-fill payment form when data loads ───────────
+  // ── Pre-fill payment form when result loads ──────────
   useEffect(() => {
     if (data?.paymentDetails) {
       const s = data.paymentDetails.paymentStatus || "unpaid"
@@ -79,32 +87,56 @@ export default function AppointmentDetailsPage() {
 
     try {
       const token = localStorage.getItem("token")
-      // ── We fetch all appointments and filter client-side
-      // This avoids needing a separate search endpoint
-      const res = await fetch("/api/appointments", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const json = await res.json()
-      if (!res.ok) throw new Error(json.message)
 
-      const match = (json.data || []).find(
-        (a) => a.fullName.toLowerCase() === selectedName.toLowerCase()
+      // ── Find in already-loaded list first ────────────
+      // This avoids an extra API call and works offline
+      let match = allAppointments.find(
+        (a) => a.fullName?.toLowerCase().trim() === selectedName.toLowerCase().trim()
       )
 
+      // ── If not in cache, re-fetch ────────────────────
       if (!match) {
-        setSearchError("Appointment not found")
+        const res = await fetch("/api/appointments", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        const json = await res.json()
+        const list = Array.isArray(json.data)
+          ? json.data
+          : Array.isArray(json.data?.appointments)
+          ? json.data.appointments
+          : []
+
+        match = list.find(
+          (a) => a.fullName?.toLowerCase().trim() === selectedName.toLowerCase().trim()
+        )
+      }
+
+      if (!match) {
+        setSearchError(`No appointment found for "${selectedName}"`)
         return
       }
 
-      // ── Fetch payment details for this appointment ───
-      const detailRes = await fetch(`/api/appointments/${match._id.toString()}`, {
+      // ── Get the ID — MongoDB uses _id ────────────────
+      const id = match._id?.toString() || match.id?.toString()
+      if (!id) {
+        setSearchError("Could not read appointment ID")
+        return
+      }
+
+      console.log("Fetching details for ID:", id) // ← debug
+
+      const detailRes = await fetch(`/api/appointments/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       const detailJson = await detailRes.json()
-      if (!detailRes.ok) throw new Error(detailJson.message)
+
+      console.log("Detail response:", detailJson) // ← debug
+
+      if (!detailRes.ok) throw new Error(detailJson.message || "Failed to load details")
 
       setData(detailJson.data)
     } catch (err) {
+      console.error("Search error:", err)
       setSearchError(err.message || "Search failed")
     } finally {
       setSearching(false)
@@ -116,14 +148,21 @@ export default function AppointmentDetailsPage() {
     setUpdateMsg(null)
 
     if (paymentStatus !== "Unpaid" && (!amount || parseFloat(amount) <= 0)) {
-      setUpdateMsg({ type: "error", text: "Enter a valid amount for Paid or Partial status" })
+      setUpdateMsg({
+        type: "error",
+        text: "Enter a valid amount for Paid or Partial status",
+      })
       return
     }
 
     setUpdating(true)
     try {
       const token = localStorage.getItem("token")
-      const res = await fetch(`/api/appointments/${data.appointment.id || data.appointment._id}`, {
+
+      // ── Use whichever ID field exists ────────────────
+      const id = data.appointment.id || data.appointment._id?.toString()
+
+      const res = await fetch(`/api/appointments/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -139,7 +178,6 @@ export default function AppointmentDetailsPage() {
       const json = await res.json()
       if (!res.ok) throw new Error(json.message)
 
-      // ── Update local payment data without re-fetching ─
       setData((prev) => ({
         ...prev,
         paymentDetails: {
@@ -166,7 +204,7 @@ export default function AppointmentDetailsPage() {
     width: "100%", padding: "0.75rem 1rem",
     border: "1.5px solid #d1d5db", borderRadius: 6,
     fontSize: "0.9rem", fontFamily: "'Barlow', sans-serif",
-    color: "#111", outline: "none",
+    color: "#111", outline: "none", background: "#fff",
   }
 
   const labelStyle = {
@@ -178,24 +216,23 @@ export default function AppointmentDetailsPage() {
   }
 
   const statusColor = {
-    paid: { bg: "#f0fdf4", text: "#15803d", border: "#bbf7d0" },
+    paid:    { bg: "#f0fdf4", text: "#15803d", border: "#bbf7d0" },
     partial: { bg: "#fefce8", text: "#a16207", border: "#fde68a" },
-    unpaid: { bg: "#fef2f2", text: "#b91c1c", border: "#fecaca" },
+    unpaid:  { bg: "#fef2f2", text: "#b91c1c", border: "#fecaca" },
   }
 
   return (
     <main style={{
-      minHeight: "100vh",
-      background: "#f0f4ff",
-      paddingTop: 80,
-      fontFamily: "'Barlow', sans-serif",
+      minHeight: "100vh", background: "#f0f4ff",
+      paddingTop: 80, fontFamily: "'Barlow', sans-serif",
     }}>
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "2rem 1.5rem" }}>
 
         {/* Header */}
         <div style={{
           display: "flex", justifyContent: "space-between",
-          alignItems: "center", marginBottom: "2rem", flexWrap: "wrap", gap: "1rem",
+          alignItems: "center", marginBottom: "2rem",
+          flexWrap: "wrap", gap: "1rem",
         }}>
           <div>
             <h1 style={{
@@ -236,19 +273,33 @@ export default function AppointmentDetailsPage() {
           }}>
             Search by Student Name
           </h2>
+
           <form onSubmit={handleSearch} style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
             <div style={{ flex: 1, minWidth: 200 }}>
-              <select
-                value={selectedName}
-                onChange={(e) => setSelectedName(e.target.value)}
-                required
-                style={{ ...inputStyle, appearance: "none" }}
-              >
-                <option value="">Select a student name</option>
-                {options.map((name) => (
-                  <option key={name} value={name}>{name}</option>
-                ))}
-              </select>
+              {options.length > 0 ? (
+                <select
+                  value={selectedName}
+                  onChange={(e) => setSelectedName(e.target.value)}
+                  required
+                  style={{ ...inputStyle, appearance: "none" }}
+                >
+                  <option value="">
+                    Select a student ({options.length} found)
+                  </option>
+                  {options.map((name) => (
+                    <option key={name} value={name}>{name}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value={selectedName}
+                  onChange={(e) => setSelectedName(e.target.value)}
+                  placeholder="Type student full name exactly..."
+                  required
+                  style={inputStyle}
+                />
+              )}
             </div>
             <button
               type="submit"
@@ -267,10 +318,22 @@ export default function AppointmentDetailsPage() {
               {searching ? "SEARCHING..." : "SEARCH →"}
             </button>
           </form>
+
+          {/* Show how many names loaded */}
+          <p style={{
+            marginTop: "0.6rem", fontSize: "0.75rem",
+            color: options.length > 0 ? "#6b7280" : "#f59e0b",
+          }}>
+            {options.length > 0
+              ? `${options.length} student${options.length !== 1 ? "s" : ""} loaded`
+              : "Loading student names..."}
+          </p>
+
           {searchError && (
             <div style={{
-              marginTop: "0.75rem",
-              color: "#b91c1c", fontSize: "0.85rem",
+              marginTop: "0.75rem", color: "#b91c1c", fontSize: "0.85rem",
+              background: "#fef2f2", border: "1px solid #fecaca",
+              padding: "0.6rem 0.85rem", borderRadius: 4,
             }}>
               {searchError}
             </div>
@@ -281,7 +344,7 @@ export default function AppointmentDetailsPage() {
         {data && (
           <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
 
-            {/* Appointment details card */}
+            {/* Appointment details */}
             <div style={{
               background: "#fff", border: "1px solid #e5e7eb",
               borderRadius: 8, padding: "1.5rem 2rem",
@@ -302,8 +365,8 @@ export default function AppointmentDetailsPage() {
               }}>
                 {[
                   ["Student", data.appointment.fullName],
-                  ["Email", data.appointment.email],
-                  ["Phone", data.appointment.phoneNumber],
+                  ["Email",   data.appointment.email],
+                  ["Phone",   data.appointment.phoneNumber],
                 ].map(([label, val]) => (
                   <div key={label}>
                     <div style={labelStyle}>{label}</div>
@@ -312,27 +375,33 @@ export default function AppointmentDetailsPage() {
                 ))}
               </div>
 
-              {/* Chapters */}
               {data.appointment.chapters && (() => {
                 const { paper, chapters } = parseChapters(data.appointment.chapters)
                 return (
-                  <div style={{ marginTop: "1.25rem", paddingTop: "1rem", borderTop: "1px solid #f3f4f6" }}>
+                  <div style={{
+                    marginTop: "1.25rem", paddingTop: "1rem",
+                    borderTop: "1px solid #f3f4f6",
+                  }}>
                     <div style={labelStyle}>📚 Chapters</div>
                     <div style={{
                       borderLeft: "3px solid #2563b8",
-                      paddingLeft: "0.85rem",
                       background: "#eff6ff",
                       borderRadius: "0 4px 4px 0",
                       padding: "0.75rem 0.85rem",
                     }}>
                       {paper && (
-                        <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#1d4ed8", marginBottom: "0.35rem" }}>
+                        <div style={{
+                          fontSize: "0.85rem", fontWeight: 600,
+                          color: "#1d4ed8", marginBottom: "0.35rem",
+                        }}>
                           {paper}
                         </div>
                       )}
                       <ul style={{ margin: 0, paddingLeft: "1.1rem" }}>
                         {chapters.map((ch) => (
-                          <li key={ch} style={{ fontSize: "0.875rem", color: "#374151" }}>{ch}</li>
+                          <li key={ch} style={{ fontSize: "0.875rem", color: "#374151" }}>
+                            {ch}
+                          </li>
                         ))}
                       </ul>
                     </div>
@@ -341,13 +410,16 @@ export default function AppointmentDetailsPage() {
               })()}
             </div>
 
-            {/* Payment info card */}
+            {/* Payment info */}
             <div style={{
               background: "#fff", border: "1px solid #e5e7eb",
               borderRadius: 8, padding: "1.5rem 2rem",
               boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
             }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "1.25rem" }}>
+              <div style={{
+                display: "flex", alignItems: "center",
+                gap: "0.75rem", marginBottom: "1.25rem",
+              }}>
                 <h2 style={{
                   fontFamily: "'Barlow Condensed', sans-serif",
                   fontWeight: 800, fontSize: "1rem",
@@ -380,13 +452,15 @@ export default function AppointmentDetailsPage() {
                   gap: "0.85rem",
                 }}>
                   {[
-                    ["Amount Paid", `R${parseFloat(data.paymentDetails.amountPaid || 0).toFixed(2)}`],
+                    ["Amount Paid",   `R${parseFloat(data.paymentDetails.amountPaid || 0).toFixed(2)}`],
                     ["Transaction ID", data.paymentDetails.transactionId || "N/A"],
-                    ["Invoice #", data.paymentDetails.invoiceNumber || "N/A"],
+                    ["Invoice #",      data.paymentDetails.invoiceNumber  || "N/A"],
                   ].map(([label, val]) => (
                     <div key={label}>
                       <div style={labelStyle}>{label}</div>
-                      <div style={{ fontSize: "0.95rem", color: "#111", fontFamily: "monospace" }}>{val}</div>
+                      <div style={{ fontSize: "0.95rem", color: "#111", fontFamily: "monospace" }}>
+                        {val}
+                      </div>
                     </div>
                   ))}
                   {data.paymentDetails.note && (
@@ -457,7 +531,9 @@ export default function AppointmentDetailsPage() {
                       position: "absolute", left: "1rem",
                       top: "50%", transform: "translateY(-50%)",
                       color: "#6b7280", fontWeight: 600,
-                    }}>R</span>
+                    }}>
+                      R
+                    </span>
                     <input
                       type="number"
                       value={amount}
@@ -469,7 +545,7 @@ export default function AppointmentDetailsPage() {
                         ...inputStyle,
                         paddingLeft: "2rem",
                         background: paymentStatus === "Unpaid" ? "#f9fafb" : "#fff",
-                        color: paymentStatus === "Unpaid" ? "#9ca3af" : "#111",
+                        color:      paymentStatus === "Unpaid" ? "#9ca3af" : "#111",
                       }}
                     />
                   </div>
@@ -490,7 +566,10 @@ export default function AppointmentDetailsPage() {
                     rows={3}
                     style={{ ...inputStyle, resize: "vertical", minHeight: 80 }}
                   />
-                  <p style={{ fontSize: "0.75rem", color: "#9ca3af", textAlign: "right", marginTop: "0.2rem" }}>
+                  <p style={{
+                    fontSize: "0.75rem", color: "#9ca3af",
+                    textAlign: "right", marginTop: "0.2rem",
+                  }}>
                     {note.length}/500
                   </p>
                 </div>

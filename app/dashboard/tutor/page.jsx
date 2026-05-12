@@ -5,7 +5,7 @@ import { useAuth, logout } from "@/lib/useAuth"
 
 export default function TutorDashboard() {
   const router = useRouter()
-  const { user, loading } = useAuth("user")
+  const { user, loading } = useAuth()
   const [count, setCount] = useState(0)
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState("")

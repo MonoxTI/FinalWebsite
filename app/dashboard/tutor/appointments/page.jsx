@@ -17,7 +17,7 @@ function parseChapters(str) {
 
 export default function AllAppointmentsPage() {
   const router = useRouter()
-  const { user, loading: authLoading } = useAuth("user")
+  const { user, loading: authLoading } = useAuth()
   const [appointments, setAppointments] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
