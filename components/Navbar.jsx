@@ -77,7 +77,7 @@ export default function Navbar() {
         color: "#fff", letterSpacing: "0.05em",
         textDecoration: "none", whiteSpace: "nowrap",
       }}>
-        ASSEMBLED<span style={{ color: "#3b82f6" }}>.</span>
+        Assembled Tutoring
       </Link>
 
       {/* Desktop links */}
