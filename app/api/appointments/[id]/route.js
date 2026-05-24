@@ -4,18 +4,18 @@ import { getAuthUser, unauthorized, forbidden } from "@/lib/auth"
 import { sendEmail } from "@/lib/email"
 import { randomUUID } from "crypto"
 
-const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-
-/* ── GET /api/appointments/:id ───────────────────
-   Get one appointment + its payment details       */
+/* ── GET /api/appointments/:id ───────────────────── */
 export async function GET(req, { params }) {
+  // ── Await params before using ────────────────────
+  const { id } = await params
+
   const user = await getAuthUser(req)
   if (!user) return unauthorized()
   if (!user.hasAccess()) return forbidden("Account pending approval")
 
   await connectDB()
 
-  const appointment = await AppointmentModel.findById(params.id).lean()
+  const appointment = await AppointmentModel.findById(id).lean()
   if (!appointment) {
     return Response.json(
       { success: false, message: "Appointment not found" },
@@ -27,31 +27,34 @@ export async function GET(req, { params }) {
     appointmentId: appointment._id,
   }).lean()
 
-return Response.json({
-  success: true,
-  data: {
-    appointment: {
-      id: appointment._id.toString(), // ← must be string
-      fullName: appointment.fullName,
-      email: appointment.email,
-      phoneNumber: appointment.phoneNumber,
-      chapters: appointment.chapters || "",
-      createdAt: appointment.createdAt,
+  return Response.json({
+    success: true,
+    data: {
+      appointment: {
+        id: appointment._id.toString(),
+        fullName: appointment.fullName,
+        email: appointment.email,
+        phoneNumber: appointment.phoneNumber,
+        chapters: appointment.chapters || "",
+        createdAt: appointment.createdAt,
+      },
+      paymentDetails: paymentDetails
+        ? {
+            paymentStatus: paymentDetails.PaymentStatus,
+            amountPaid: paymentDetails.AmountPaid,
+            transactionId: paymentDetails.TransactionID,
+            invoiceNumber: paymentDetails.invoiceNumber,
+            note: paymentDetails.Note,
+          }
+        : null,
     },
-    paymentDetails: paymentDetails ? {
-      paymentStatus: paymentDetails.PaymentStatus,
-      amountPaid: paymentDetails.AmountPaid,
-      transactionId: paymentDetails.TransactionID,
-      invoiceNumber: paymentDetails.invoiceNumber,
-      note: paymentDetails.Note,
-    } : null,
-  },
-})
+  })
 }
 
-/* ── PATCH /api/appointments/:id ─────────────────
-   Update payment status for one appointment       */
+/* ── PATCH /api/appointments/:id ─────────────────── */
 export async function PATCH(req, { params }) {
+  const { id } = await params
+
   const user = await getAuthUser(req)
   if (!user) return unauthorized()
   if (!user.hasAccess()) return forbidden("Account pending approval")
@@ -78,7 +81,7 @@ export async function PATCH(req, { params }) {
 
   await connectDB()
 
-  const appointment = await AppointmentModel.findById(params.id)
+  const appointment = await AppointmentModel.findById(id)
   if (!appointment) {
     return Response.json(
       { success: false, message: "Appointment not found" },
@@ -93,7 +96,6 @@ export async function PATCH(req, { params }) {
   const previousStatus = paymentDetails?.PaymentStatus?.toLowerCase() || "unpaid"
   const becamePaid = normalizedStatus === "paid" && previousStatus !== "paid"
 
-  // ── Only generate IDs when payment transitions to paid ──
   const transactionId = becamePaid
     ? `TXN-${Date.now()}-${randomUUID().slice(0, 6).toUpperCase()}`
     : paymentDetails?.TransactionID || null
@@ -121,7 +123,6 @@ export async function PATCH(req, { params }) {
     })
   }
 
-  // ── Send invoice email only when payment first becomes paid ──
   if (becamePaid && appointment.email) {
     try {
       await sendEmail({
@@ -129,26 +130,19 @@ export async function PATCH(req, { params }) {
         subject: `Invoice ${invoiceNumber} - Payment Confirmed`,
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:auto;color:#333">
-            <h2 style="color:#16a34a;border-bottom:2px solid #16a34a;padding-bottom:10px">
-              ✅ Payment Received
-            </h2>
+            <h2 style="color:#16a34a">✅ Payment Received</h2>
             <p>Hello <strong>${appointment.fullName}</strong>,</p>
-            <p>We have successfully received your payment.</p>
-            <hr style="border:none;border-top:1px solid #eee;margin:20px 0"/>
-            <table style="width:100%;border-collapse:collapse">
-              <tr><td style="padding:6px 0"><strong>Invoice:</strong></td><td>${invoiceNumber}</td></tr>
-              <tr><td style="padding:6px 0"><strong>Transaction ID:</strong></td><td>${transactionId}</td></tr>
-              <tr><td style="padding:6px 0"><strong>Amount Paid:</strong></td><td>R${amount.toFixed(2)}</td></tr>
-              <tr><td style="padding:6px 0"><strong>Date:</strong></td><td>${new Date().toLocaleDateString()}</td></tr>
+            <p>We have received your payment.</p>
+            <table style="width:100%">
+              <tr><td><strong>Invoice:</strong></td><td>${invoiceNumber}</td></tr>
+              <tr><td><strong>Transaction ID:</strong></td><td>${transactionId}</td></tr>
+              <tr><td><strong>Amount:</strong></td><td>R${amount.toFixed(2)}</td></tr>
+              <tr><td><strong>Date:</strong></td><td>${new Date().toLocaleDateString()}</td></tr>
             </table>
-            <p style="font-size:14px;color:#666;margin-top:20px">
-              Thank you. Please keep this email for your records.
-            </p>
           </div>
         `,
       })
     } catch (emailError) {
-      // Email failure should never crash the payment update
       console.error("Invoice email failed:", emailError.message)
     }
   }
@@ -166,16 +160,17 @@ export async function PATCH(req, { params }) {
   })
 }
 
-/* ── DELETE /api/appointments/:id ────────────────
-   Delete one specific appointment                 */
+/* ── DELETE /api/appointments/:id ────────────────── */
 export async function DELETE(req, { params }) {
+  const { id } = await params
+
   const user = await getAuthUser(req)
   if (!user) return unauthorized()
   if (!user.hasAccess()) return forbidden("Account pending approval")
 
   await connectDB()
 
-  const appointment = await AppointmentModel.findByIdAndDelete(params.id)
+  const appointment = await AppointmentModel.findByIdAndDelete(id)
   if (!appointment) {
     return Response.json(
       { success: false, message: "Appointment not found" },
@@ -183,8 +178,7 @@ export async function DELETE(req, { params }) {
     )
   }
 
-  // ── Also delete the linked payment details ───────────
-  await AppointmentDetailsModel.deleteOne({ appointmentId: params.id })
+  await AppointmentDetailsModel.deleteOne({ appointmentId: id })
 
   return Response.json({
     success: true,
