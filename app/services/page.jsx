@@ -3,6 +3,12 @@ import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import Link from "next/link"
 
+export const metadata  = {
+  title: "Services & Pricing",
+  description:
+    "View our tutoring packages. Monthly subscriptions from R1500. Once-off sessions from R500. Grade 4 through Matric covered.",
+}
+
 const PRICING = [
   { grade: "GRADE 4–7",   monthly: "R1 500", perLesson: "R500" },
   { grade: "GRADE 8–9",   monthly: "R1 800", perLesson: "R600" },

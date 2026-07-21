@@ -3,6 +3,12 @@ import { useState } from "react"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 
+export const metadata = {
+  title: "Book a Session",
+  description:
+    "Book your Maths tutoring session online. Choose your grade, paper, and chapters. Available in Pretoria and online.",
+}
+
 const CHAPTER_OPTIONS = {
   "Maths Paper 1": [
     "Algebra",

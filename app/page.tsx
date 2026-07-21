@@ -4,6 +4,14 @@ import Footer from "@/components/Footer"
 import Link from "next/link"
 import Image from "next/image"
 
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Home",
+  description:
+    "Assembled Tutoring offers expert Grade 4–12 Mathematics tutoring in Pretoria, Gauteng. Psychological transformation approach. Book a session today.",
+}
+
 export default function HomePage() {
   return (
     <>
