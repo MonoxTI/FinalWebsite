@@ -17,8 +17,56 @@ const barlowCondensed = Barlow_Condensed({
 
 // ── metadata lives here in the Server Component ──────────
 export const metadata: Metadata = {
-  title: "Assembled Tutoring",
-  description: "Making education fashionable — expert tutoring for Grade 4 to 12.",
+  metadataBase: new URL("https://www.assembledtutors.co.za/"),
+  title: {
+    default: "Assembled Tutoring | Grade 4–12 Maths Tutor Pretoria",
+    template: "%s | Assembled Tutoring",
+  },
+  description:
+    "Expert Grade 4 to 12 Mathematics tutoring in Pretoria, Gauteng. Monthly subscriptions and once-off sessions available. Psychological transformation approach.",
+  keywords: [
+    "maths tutor Pretoria",
+    "Grade 12 mathematics tutor",
+    "tutoring Pretoria",
+    "maths tutoring Gauteng",
+    "Grade 12 maths help",
+    "assembled tutoring",
+    "matric maths tutor",
+    "private tutor Pretoria",
+  ],
+  authors: [{ name: "Assembled Tutoring" }],
+  creator: "Assembled Tutoring",
+  openGraph: {
+    type: "website",
+    locale: "en_ZA",
+    url: "https://www.assembledtutors.co.za/",
+    siteName: "Assembled Tutoring",
+    title: "Assembled Tutoring | Grade 4–12 Maths Tutor Pretoria",
+    description:
+      "Expert Grade 4 to 12 Mathematics tutoring in Pretoria. Monthly subscriptions available. Book your first session today.",
+    images: [
+      {
+        url: "/images/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Assembled Tutoring",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Assembled Tutoring | Grade 4–12 Maths Tutor Pretoria",
+    description: "Expert maths tutoring in Pretoria. Book a session today.",
+    images: ["/images/og-image.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
 }
 
 export default function RootLayout({

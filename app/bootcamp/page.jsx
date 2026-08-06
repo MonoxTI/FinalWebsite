@@ -41,19 +41,12 @@ export default function BootcampPage() {
             🚀 Intensive Learning
           </div>
           <h1 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 900,
-            fontSize: "clamp(2.5rem,7vw,5.5rem)",
+            fontSize: "clamp(1.8rem,7vw,5.5rem)",
             lineHeight: 0.95, textTransform: "uppercase",
             marginBottom: "1rem",
           }}>
-            MATHS<br />
-            <span style={{
-              fontFamily: "'Playfair Display', serif",
-              fontStyle: "italic", fontWeight: 400,
-            }}>
-              Bootcamp
-            </span>
+            MATHS BOOTCAMP
           </h1>
           <p style={{
             fontSize: "clamp(1rem,2vw,1.15rem)",

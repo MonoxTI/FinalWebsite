@@ -7,6 +7,7 @@ export default function AdminDashboard() {
   const router = useRouter()
   const { user, loading } = useAuth("admin")
   const [pendingUsers, setPendingUsers] = useState([])
+  const [newBookings, setNewBookings] = useState(0)
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState("")
   const [success, setSuccess] = useState("")
@@ -15,7 +16,28 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (!user) return
     fetchPending()
+    fetchNewBookings()
   }, [user])
+
+  const fetchNewBookings = async () => {
+    try {
+      const token = localStorage.getItem("token")
+      const res = await fetch("/api/appointments", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (!res.ok) return
+      const list = data.data || []
+      const lastVisit = localStorage.getItem("lastAppointmentsVisit")
+      const lastVisitTime = lastVisit ? new Date(lastVisit).getTime() : 0
+      const unseen = list.filter(
+        (a) => new Date(a.createdAt).getTime() > lastVisitTime
+      ).length
+      setNewBookings(unseen)
+    } catch {
+      // Non-critical — silently ignore, tutor dashboard still shows the count
+    }
+  }
 
   const fetchPending = async () => {
     try {
@@ -158,9 +180,21 @@ export default function AdminDashboard() {
       borderLeft: "4px solid #2563b8",
       borderRadius: 8, padding: "1.25rem 1.5rem",
       textAlign: "left", cursor: "pointer",
+      position: "relative",
       boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
     }}
   >
+    {newBookings > 0 && (
+      <span style={{
+        position: "absolute", top: "0.85rem", right: "0.85rem",
+        background: "#ef4444", color: "#fff",
+        fontFamily: "'Barlow Condensed', sans-serif",
+        fontWeight: 800, fontSize: "0.7rem",
+        borderRadius: 20, padding: "0.15rem 0.55rem",
+      }}>
+        {newBookings} NEW
+      </span>
+    )}
     <div style={{
       fontFamily: "'Barlow Condensed', sans-serif",
       fontWeight: 800, fontSize: "0.95rem",

@@ -87,6 +87,7 @@ export default function HomePage() {
             lineHeight: 1.7,
             color: "rgba(255,255,255,0.75)",
             maxWidth: 580, marginBottom: "1.5rem",
+            textAlign: "justify",
           }}>
             Mathematics is a language that requires understanding the fundamentals
             & the underlying basics of all its topics — post psychological transformation.
@@ -105,8 +106,7 @@ export default function HomePage() {
             Making Education Fashionable
           </p>
         </div>
-
-        {/* Logo watermark — top right */}
+          {/* Logo watermark — top right */}
         <div style={{
           position: "absolute", right: "clamp(1rem,5vw,4rem)",
           top: "50%", transform: "translateY(-50%)",
@@ -128,38 +128,62 @@ export default function HomePage() {
         color: "#111",
         padding: "clamp(4rem,8vw,7rem) clamp(1.5rem,6vw,5rem)",
       }}>
-        <div style={{ maxWidth: 780 }}>
-          <h2 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 900,
-            fontSize: "clamp(2rem,5vw,3.5rem)",
-            lineHeight: 0.95, letterSpacing: "-0.01em",
-            textTransform: "uppercase", marginBottom: "0.5rem",
-          }}>
-            ABOUT
-          </h2>
-          <h3 style={{
-            fontFamily: "'Playfair Display', serif",
-            fontStyle: "italic", fontWeight: 400,
-            fontSize: "clamp(1.5rem,3vw,2.5rem)",
-            color: "#374151", marginBottom: "2rem",
-          }}>
-            Mission
-          </h3>
-
-          {[
-            <>The barrier encountered in learning is often not a lack of "logic," but a psychological block. Our aim commences with addressing the Cognitive, Affective, and Metacognitive layers of learning. Simply, <strong>Psychological Transformation</strong> is a technique we use to psychologically infiltrate & remove the thought(s) that certain subjects are unattainable (e.g., "Mathematics is hard"). Once the learner's psychological thoughts are realigned, constant engagement with the work is required.</>,
-            <>Mathematics requires memory — the ability to hold multiple pieces of information (like a formula, a carry-over digit, and a negative sign) all at once. Thus, for better interaction, we offer monthly subscriptions. We have noted in the past that the more interaction with the work, the easier it is for their minds to absorb fundamental underlying principles.</>,
-            <>We use <strong>cognitive offloading</strong> to 'offload' the mental agony into intermediate steps that are constantly practised, and free up the 'mental script' for complex problem-solving.</>,
-          ].map((text, i) => (
-            <p key={i} style={{
-              fontSize: "clamp(0.95rem,1.5vw,1.05rem)",
-              lineHeight: 1.8, color: "#374151",
-              marginBottom: "1.25rem",
+        <div style={{
+          maxWidth: 1100, margin: "0 auto",
+          display: "flex", gap: "clamp(1.5rem,5vw,3.5rem)",
+          alignItems: "center", flexWrap: "wrap",
+        }}>
+          <div style={{ flex: "1 1 420px", minWidth: 280 }}>
+            <h2 style={{
+              fontFamily: "'Barlow Condensed', sans-serif",
+              fontWeight: 900,
+              fontSize: "clamp(2rem,5vw,3.5rem)",
+              lineHeight: 0.95, letterSpacing: "-0.01em",
+              textTransform: "uppercase", marginBottom: "0.5rem",
             }}>
-              {text}
-            </p>
-          ))}
+              ABOUT
+            </h2>
+            <h3 style={{
+              fontFamily: "'Playfair Display', serif",
+              fontStyle: "italic", fontWeight: 400,
+              fontSize: "clamp(1.5rem,3vw,2.5rem)",
+              color: "#374151", marginBottom: "2rem",
+            }}>
+              Mission
+            </h3>
+
+            {[
+              <>The barrier encountered in learning is often not a lack of "logic," but a psychological block. Our aim commences with addressing the Cognitive, Affective, and Metacognitive layers of learning. Simply, <strong>Psychological Transformation</strong> is a technique we use to psychologically infiltrate & remove the thought(s) that certain subjects are unattainable (e.g., "Mathematics is hard"). Once the learner's psychological thoughts are realigned, constant engagement with the work is required.</>,
+              <>Mathematics requires memory — the ability to hold multiple pieces of information (like a formula, a carry-over digit, and a negative sign) all at once. Thus, for better interaction, we offer monthly subscriptions. We have noted in the past that the more interaction with the work, the easier it is for their minds to absorb fundamental underlying principles.</>,
+              <>We use <strong>cognitive offloading</strong> to 'offload' the mental agony into intermediate steps that are constantly practised, and free up the 'mental script' for complex problem-solving.</>,
+            ].map((text, i) => (
+              <p key={i} style={{
+                fontSize: "clamp(0.95rem,1.5vw,1.05rem)",
+                lineHeight: 1.8, color: "#374151",
+                marginBottom: "1.25rem",
+                textAlign: "justify",
+              }}>
+                {text}
+              </p>
+            ))}
+          </div>
+
+          <div style={{
+            flex: "0 1 280px",
+            display: "flex", justifyContent: "center",
+          opacity: 0.25,
+          }}>
+            <img
+              src="/images/LOGO.png"
+              alt="Assembled Tutoring logo"
+              loading="lazy"
+              style={{
+                width: "clamp(160px,22vw,280px)",
+                height: "auto",
+                objectFit: "contain",
+              }}
+            />
+          </div>
         </div>
       </section>
 
@@ -199,6 +223,7 @@ export default function HomePage() {
               fontSize: "clamp(0.95rem,1.5vw,1.05rem)",
               lineHeight: 1.8,
               color: "rgba(255,255,255,0.75)",
+              textAlign: "justify",
             }}>
               A proud alumna of Pretoria High School for Girls, a BCom Law and LLB
               graduate from the University of Pretoria. She aspires to become an
@@ -292,7 +317,7 @@ export default function HomePage() {
                 }}>
                   {title}
                 </h4>
-                <p style={{ fontSize: "0.97rem", lineHeight: 1.8, color: "#374151" }}>
+                <p style={{ fontSize: "0.97rem", lineHeight: 1.8, color: "#374151", textAlign: "justify" }}>
                   {body}
                 </p>
               </div>
@@ -334,15 +359,25 @@ export default function HomePage() {
         padding: "clamp(4rem,8vw,6rem) clamp(1.5rem,6vw,5rem)",
       }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <h2 style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 900,
-            fontSize: "clamp(2rem,5vw,3.5rem)",
-            textTransform: "uppercase",
-            marginBottom: "2rem",
+          <div style={{
+            display: "flex", alignItems: "center", gap: "1.25rem",
+            marginBottom: "2rem", flexWrap: "wrap",
           }}>
-            SERVICES
-          </h2>
+            <img
+              src="/images/LOGO.png"
+              alt="Assembled Tutoring logo"
+              loading="lazy"
+              style={{ height: "clamp(48px,8vw,72px)", width: "auto", objectFit: "contain" }}
+            />
+            <h2 style={{
+              fontWeight: 900,
+              fontSize: "clamp(2rem,5vw,3.5rem)",
+              textTransform: "uppercase",
+              margin: 0,
+            }}>
+              SERVICES
+            </h2>
+          </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             {/* ⬆️ Separated header from rows to remove fragile `i === 0` logic */}

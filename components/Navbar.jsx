@@ -27,7 +27,7 @@ export default function Navbar() {
     setUser(str ? JSON.parse(str) : null)
   }, [pathname])
 
-  // ── Close dropdown when clicking outside ────────────
+  // ── Close About dropdown when clicking outside ──────
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (aboutRef.current && !aboutRef.current.contains(e.target)) {
@@ -38,7 +38,7 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  // ── Close mobile menu on route change ───────────────
+  // ── Close menus on route change ─────────────────────
   useEffect(() => {
     setMenuOpen(false)
     setAboutOpen(false)
@@ -50,6 +50,7 @@ export default function Navbar() {
   }
 
   const isActive = (href) => pathname === href
+  const isAboutActive = pathname === "/about/mission" || pathname === "/about/founder"
 
   const linkStyle = (href) => ({
     padding: "0.5rem 0.85rem",
@@ -69,8 +70,35 @@ export default function Navbar() {
     whiteSpace: "nowrap",
   })
 
+  // Links shown flat on desktop, either side of the About dropdown
+  const NAV_ITEMS = [
+    { href: "/", label: "Home" },
+    { href: "/services", label: "Services" },
+    //{ href: "/bootcamp", label: " Bootcamp", highlight: true },
+    { href: "/appointments", label: "Book a Session" },
+    { href: "/contact", label: "Contact" },
+  ]
+
+  const ABOUT_ITEMS = [
+    { href: "/about/mission", label: "Mission", },
+    { href: "/about/founder", label: "Founder", },
+  ]
+
   return (
     <>
+      {/* Breakpoint: below 900px → hamburger + collapsible menu.
+          900px and above → flat links + an About dropdown, no hamburger. */}
+      <style>{`
+        .nav-desktop-links { display: none; }
+        .nav-hamburger-btn { display: inline-flex; }
+        .nav-mobile-menu { display: flex; }
+        @media (min-width: 900px) {
+          .nav-desktop-links { display: flex !important; }
+          .nav-hamburger-btn { display: none !important; }
+          .nav-mobile-menu { display: none !important; }
+        }
+      `}</style>
+
       <nav style={{
         position: "fixed", top: 0, left: 0, right: 0, zIndex: 999,
         background: "linear-gradient(90deg, #000 0%, #0a1628 50%, #1d4ed8 100%)",
@@ -91,12 +119,11 @@ export default function Navbar() {
           ASSEMBLED<span style={{ color: "#3b82f6" }}>.</span>
         </Link>
 
-        {/* Desktop links */}
-        <div style={{
-          display: "flex", alignItems: "center",
+        {/* Desktop / laptop — flat links + one About dropdown */}
+        <div className="nav-desktop-links" style={{
+          alignItems: "center",
           gap: "0.25rem", flexWrap: "wrap",
         }}>
-
           {/* Home */}
           <Link href="/" style={linkStyle("/")}>Home</Link>
 
@@ -107,7 +134,7 @@ export default function Navbar() {
               style={{
                 ...linkStyle("/about"),
                 display: "flex", alignItems: "center", gap: "0.35rem",
-                background: (isActive("/about/mission") || isActive("/about/founder") || aboutOpen)
+                background: (isAboutActive || aboutOpen)
                   ? "rgba(255,255,255,0.15)"
                   : "transparent",
               }}
@@ -123,11 +150,10 @@ export default function Navbar() {
               </span>
             </button>
 
-            {/* Dropdown menu */}
             {aboutOpen && (
               <div style={{
                 position: "absolute", top: "calc(100% + 0.5rem)",
-                left: 0, minWidth: 180,
+                left: 0, minWidth: 200,
                 background: "#0a1628",
                 border: "1px solid rgba(59,130,246,0.3)",
                 borderRadius: 8,
@@ -135,96 +161,58 @@ export default function Navbar() {
                 boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
                 zIndex: 1000,
               }}>
-                <Link
-                  href="/about/mission"
-                  onClick={() => setAboutOpen(false)}
-                  style={{
-                    display: "flex", alignItems: "center", gap: "0.75rem",
-                    padding: "0.85rem 1.25rem",
-                    color: "#fff", textDecoration: "none",
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontWeight: 600, fontSize: "0.85rem",
-                    letterSpacing: "0.08em", textTransform: "uppercase",
-                    borderBottom: "1px solid rgba(59,130,246,0.15)",
-                    transition: "background 0.15s",
-                    background: isActive("/about/mission")
-                      ? "rgba(59,130,246,0.2)"
-                      : "transparent",
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = "rgba(59,130,246,0.15)"}
-                  onMouseLeave={e => e.currentTarget.style.background = isActive("/about/mission") ? "rgba(59,130,246,0.2)" : "transparent"}
-                >
-                  <span style={{ fontSize: "1rem" }}>🎯</span>
-                  <div>
-                    <div>Mission</div>
-                    <div style={{
-                      fontSize: "0.7rem", color: "rgba(255,255,255,0.45)",
-                      fontWeight: 400, letterSpacing: "0.04em",
-                      textTransform: "none", marginTop: 2,
-                    }}>
-                      Our philosophy & approach
+                {ABOUT_ITEMS.map(({ href, label, icon, desc }, i) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={() => setAboutOpen(false)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: "0.75rem",
+                      padding: "0.85rem 1.25rem",
+                      color: "#fff", textDecoration: "none",
+                      fontFamily: "'Barlow Condensed', sans-serif",
+                      fontWeight: 600, fontSize: "0.85rem",
+                      letterSpacing: "0.08em", textTransform: "uppercase",
+                      borderBottom: i === 0 ? "1px solid rgba(59,130,246,0.15)" : "none",
+                      transition: "background 0.15s",
+                      background: isActive(href) ? "rgba(59,130,246,0.2)" : "transparent",
+                    }}
+                    onMouseEnter={e => e.currentTarget.style.background = "rgba(59,130,246,0.15)"}
+                    onMouseLeave={e => e.currentTarget.style.background = isActive(href) ? "rgba(59,130,246,0.2)" : "transparent"}
+                  >
+                    <span style={{ fontSize: "1rem" }}>{icon}</span>
+                    <div>
+                      <div>{label}</div>
+                      <div style={{
+                        fontSize: "0.7rem", color: "rgba(255,255,255,0.45)",
+                        fontWeight: 400, letterSpacing: "0.04em",
+                        textTransform: "none", marginTop: 2,
+                      }}>
+                        {desc}
+                      </div>
                     </div>
-                  </div>
-                </Link>
-
-                <Link
-                  href="/about/founder"
-                  onClick={() => setAboutOpen(false)}
-                  style={{
-                    display: "flex", alignItems: "center", gap: "0.75rem",
-                    padding: "0.85rem 1.25rem",
-                    color: "#fff", textDecoration: "none",
-                    fontFamily: "'Barlow Condensed', sans-serif",
-                    fontWeight: 600, fontSize: "0.85rem",
-                    letterSpacing: "0.08em", textTransform: "uppercase",
-                    transition: "background 0.15s",
-                    background: isActive("/about/founder")
-                      ? "rgba(59,130,246,0.2)"
-                      : "transparent",
-                  }}
-                  onMouseEnter={e => e.currentTarget.style.background = "rgba(59,130,246,0.15)"}
-                  onMouseLeave={e => e.currentTarget.style.background = isActive("/about/founder") ? "rgba(59,130,246,0.2)" : "transparent"}
-                >
-                  <span style={{ fontSize: "1rem" }}>👩‍🎓</span>
-                  <div>
-                    <div>Founder</div>
-                    <div style={{
-                      fontSize: "0.7rem", color: "rgba(255,255,255,0.45)",
-                      fontWeight: 400, letterSpacing: "0.04em",
-                      textTransform: "none", marginTop: 2,
-                    }}>
-                      Meet the team
-                    </div>
-                  </div>
-                </Link>
+                  </Link>
+                ))}
               </div>
             )}
           </div>
 
-          {/* Services */}
-          <Link href="/services" style={linkStyle("/services")}>Services</Link>
+          {/* Remaining flat links */}
+          {NAV_ITEMS.filter(i => i.href !== "/").map(({ href, label, highlight }) => (
+            <Link
+              key={href}
+              href={href}
+              style={highlight ? {
+                ...linkStyle(href),
+                background: isActive(href) ? "rgba(59,130,246,0.3)" : "rgba(59,130,246,0.15)",
+                border: "1px solid rgba(59,130,246,0.4)",
+                borderRadius: 6,
+              } : linkStyle(href)}
+            >
+              {label}
+            </Link>
+          ))}
 
-          {/* Bootcamp */}
-          <Link href="/bootcamp" style={{
-            ...linkStyle("/bootcamp"),
-            background: isActive("/bootcamp")
-              ? "rgba(59,130,246,0.3)"
-              : "rgba(59,130,246,0.15)",
-            border: "1px solid rgba(59,130,246,0.4)",
-            borderRadius: 6,
-          }}>
-            🚀 Bootcamp
-          </Link>
-
-          {/* Appointments */}
-          <Link href="/appointments" style={linkStyle("/appointments")}>
-            Book a Session
-          </Link>
-
-          {/* Contact */}
-          <Link href="/contact" style={linkStyle("/contact")}>Contact</Link>
-
-          {/* Logged in + approved */}
           {user && user.role !== "pending" && (
             <>
               <Link
@@ -243,7 +231,6 @@ export default function Navbar() {
             </>
           )}
 
-          {/* Pending */}
           {user?.role === "pending" && (
             <>
               <span style={{
@@ -252,45 +239,40 @@ export default function Navbar() {
                 fontWeight: 700, fontSize: "0.8rem",
                 letterSpacing: "0.1em", padding: "0 0.5rem",
               }}>
-                ⏳ PENDING
+                 PENDING
               </span>
               <button onClick={handleLogout} style={linkStyle("")}>Logout</button>
             </>
           )}
-
-          {/* Mobile hamburger */}
-          <button
-            onClick={() => setMenuOpen((o) => !o)}
-            style={{
-              background: "none", border: "none",
-              color: "#fff", cursor: "pointer", padding: "0.5rem",
-              fontSize: "1.25rem",
-            }}
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? "✕" : "☰"}
-          </button>
         </div>
+
+        {/* Mobile / small screens — hamburger toggles the menu below */}
+        <button
+          className="nav-hamburger-btn"
+          onClick={() => setMenuOpen((o) => !o)}
+          style={{
+            background: "none", border: "none",
+            color: "#fff", cursor: "pointer", padding: "0.5rem",
+            fontSize: "1.25rem", alignItems: "center", justifyContent: "center",
+          }}
+          aria-label="Toggle menu"
+        >
+          {menuOpen ? "✕" : "☰"}
+        </button>
       </nav>
 
-      {/* Mobile dropdown */}
+      {/* Mobile dropdown menu — only ever shown on small screens */}
       {menuOpen && (
-        <div style={{
+        <div className="nav-mobile-menu" style={{
           position: "fixed", top: 64, left: 0, right: 0, zIndex: 998,
           background: "#0a1628",
           borderTop: "1px solid rgba(255,255,255,0.1)",
           padding: "1rem 1.5rem",
-          display: "flex", flexDirection: "column", gap: "0.25rem",
+          flexDirection: "column", gap: "0.25rem",
           maxHeight: "calc(100vh - 64px)",
           overflowY: "auto",
         }}>
-          {[
-            { href: "/", label: "Home" },
-            { href: "/services", label: "Services" },
-            { href: "/bootcamp", label: "🚀 Bootcamp" },
-            { href: "/appointments", label: "Book a Session" },
-            { href: "/contact", label: "Contact" },
-          ].map(({ href, label }) => (
+          {NAV_ITEMS.map(({ href, label }) => (
             <Link
               key={href} href={href}
               onClick={() => setMenuOpen(false)}
@@ -304,7 +286,7 @@ export default function Navbar() {
             </Link>
           ))}
 
-          {/* About section in mobile */}
+          {/* About section in mobile — flat list under a heading */}
           <div style={{
             borderTop: "1px solid rgba(255,255,255,0.1)",
             paddingTop: "0.5rem", marginTop: "0.25rem",
@@ -318,10 +300,7 @@ export default function Navbar() {
             }}>
               About
             </div>
-            {[
-              { href: "/about/mission", label: "🎯 Mission" },
-              { href: "/about/founder", label: "👩‍🎓 Founder" },
-            ].map(({ href, label }) => (
+            {ABOUT_ITEMS.map(({ href, label, icon }) => (
               <Link
                 key={href} href={href}
                 onClick={() => setMenuOpen(false)}
@@ -331,7 +310,7 @@ export default function Navbar() {
                   padding: "0.65rem 1rem",
                 }}
               >
-                {label}
+                {icon} {label}
               </Link>
             ))}
           </div>
@@ -350,6 +329,29 @@ export default function Navbar() {
               >
                 Dashboard
               </Link>
+              <button
+                onClick={handleLogout}
+                style={{
+                  ...linkStyle(""),
+                  width: "100%", textAlign: "left",
+                  padding: "0.75rem 1rem",
+                }}
+              >
+                Logout
+              </button>
+            </>
+          )}
+
+          {user?.role === "pending" && (
+            <>
+              <span style={{
+                color: "#fbbf24",
+                fontFamily: "'Barlow Condensed', sans-serif",
+                fontWeight: 700, fontSize: "0.8rem",
+                letterSpacing: "0.1em", padding: "0.75rem 1rem", display: "block",
+              }}>
+                ⏳ PENDING APPROVAL
+              </span>
               <button
                 onClick={handleLogout}
                 style={{

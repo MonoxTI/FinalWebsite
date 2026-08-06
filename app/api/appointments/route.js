@@ -1,16 +1,41 @@
 import { connectDB } from "@/lib/mongodb";
 import { AppointmentModel } from "@/models/DB";
 import { getAuthUser, unauthorized, forbidden } from "@/lib/auth";
+import { sendEmail } from "@/lib/email";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const VALID_GRADES = [
+  "Grade 4", "Grade 5", "Grade 6", "Grade 7",
+  "Grade 8", "Grade 9", "Grade 10", "Grade 11", "Grade 12",
+];
+
+const VALID_CURRICULA = ["CAPS", "IEB"];
+const VALID_SERVICE_TYPES = ["Monthly Subscription", "Single Lesson"];
+
 /* ─── POST /api/appointments ─────────────────── 
-   Public — anyone can book                      */
+   Public — anyone can book. Form captures:
+     - Parent details (fullName, email, phoneNumber)
+     - Child details (childName, school)
+     - Grade
+     - Curriculum (CAPS / IEB)
+     - Subjects needed
+     - Service type (Monthly Subscription / Single Lesson)
+     - Additional notes (optional)                */
 export async function POST(req) {
   try {
-    const { fullName, email, phoneNumber, chapters } = await req.json();
+    const {
+      fullName, email, phoneNumber,
+      childName, school, grade,
+      curriculum, subjects, serviceType, notes,
+    } = await req.json();
 
-    if (!fullName?.trim() || !email?.trim() || !phoneNumber || !chapters?.trim()) {
+    if (
+      !fullName?.trim() || !email?.trim() || !phoneNumber ||
+      !childName?.trim() || !school?.trim() || !grade?.trim() ||
+      !curriculum?.trim() || !serviceType?.trim() ||
+      !Array.isArray(subjects) || subjects.length === 0
+    ) {
       return Response.json(
         { success: false, message: "All fields are required" },
         { status: 400 }
@@ -32,14 +57,73 @@ export async function POST(req) {
       );
     }
 
+    if (!VALID_GRADES.includes(grade.trim())) {
+      return Response.json(
+        { success: false, message: "Invalid grade selected" },
+        { status: 400 }
+      );
+    }
+
+    if (!VALID_CURRICULA.includes(curriculum.trim())) {
+      return Response.json(
+        { success: false, message: "Invalid curriculum selected" },
+        { status: 400 }
+      );
+    }
+
+    if (!VALID_SERVICE_TYPES.includes(serviceType.trim())) {
+      return Response.json(
+        { success: false, message: "Invalid service type selected" },
+        { status: 400 }
+      );
+    }
+
     await connectDB();
 
     const appointment = await AppointmentModel.create({
       fullName: fullName.trim(),
       email: email.trim().toLowerCase(),
       phoneNumber: phoneClean,
-      chapters: chapters.trim(),
+      childName: childName.trim(),
+      school: school.trim(),
+      grade: grade.trim(),
+      curriculum: curriculum.trim(),
+      subjects: subjects.map((s) => s.trim()).filter(Boolean),
+      serviceType: serviceType.trim(),
+      notes: notes?.trim() || "",
     });
+
+    // ── Notify admin that a new booking has come in ──────
+    // Non-blocking: booking still succeeds even if the email fails to send.
+    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL;
+    if (adminEmail) {
+      try {
+        await sendEmail({
+          to: adminEmail,
+          subject: `New Booking — ${childName.trim()} (${grade.trim()})`,
+          html: `
+            <div style="font-family:sans-serif;max-width:600px;margin:auto;color:#333">
+              <h2 style="color:#1d4ed8">📅 New Appointment Booked</h2>
+              <table style="width:100%;border-collapse:collapse">
+                <tr><td><strong>Parent Name:</strong></td><td>${fullName.trim()}</td></tr>
+                <tr><td><strong>Parent Email:</strong></td><td>${email.trim()}</td></tr>
+                <tr><td><strong>Parent Phone:</strong></td><td>${phoneClean}</td></tr>
+                <tr><td><strong>Child Name:</strong></td><td>${childName.trim()}</td></tr>
+                <tr><td><strong>School:</strong></td><td>${school.trim()}</td></tr>
+                <tr><td><strong>Grade:</strong></td><td>${grade.trim()}</td></tr>
+                <tr><td><strong>Curriculum:</strong></td><td>${curriculum.trim()}</td></tr>
+                <tr><td><strong>Subjects:</strong></td><td>${subjects.join(", ")}</td></tr>
+                <tr><td><strong>Service:</strong></td><td>${serviceType.trim()}</td></tr>
+                <tr><td><strong>Notes:</strong></td><td>${notes?.trim() || "—"}</td></tr>
+              </table>
+              <p style="margin-top:1rem">Log in to the tutor dashboard to view full details.</p>
+            </div>
+          `,
+        });
+      } catch (emailError) {
+        console.error("Admin notification email failed:", emailError.message);
+      }
+    }
 
     return Response.json(
       { success: true, message: "Appointment created", data: appointment },

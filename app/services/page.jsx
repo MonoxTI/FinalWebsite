@@ -22,28 +22,21 @@ export default function ServicesPage() {
         padding: "clamp(5rem,10vw,8rem) clamp(1.5rem,6vw,5rem) 4rem",
         position: "relative", overflow: "hidden",
       }}>
-        {/* Logo watermark */}
+        {/* Logo watermark — resized proportionally (aspect ratio preserved) */}
         <div style={{
           position: "absolute", right: "clamp(1rem,5vw,4rem)",
           top: "50%", transform: "translateY(-50%)",
           opacity: 0.07, pointerEvents: "none",
+          maxWidth: "45vw",
         }}>
           <img
             src="/images/LOGO.png"
             alt=""
-            style={{ height: "clamp(200px,35vw,500px)", width: "auto" }}
+            style={{ height: "clamp(200px,35vw,500px)", width: "auto", maxWidth: "100%", objectFit: "contain" }}
           />
         </div>
 
         <div style={{ maxWidth: 700, position: "relative", zIndex: 1 }}>
-          <div style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700, fontSize: "0.72rem",
-            letterSpacing: "0.2em", textTransform: "uppercase",
-            color: "#60a5fa", marginBottom: "0.75rem",
-          }}>
-            What We Offer
-          </div>
           <h1 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 900,
@@ -51,17 +44,8 @@ export default function ServicesPage() {
             lineHeight: 0.95, textTransform: "uppercase",
             marginBottom: "1rem",
           }}>
-            SERVICES &
+            Service & Pricing
           </h1>
-          <p style={{
-            fontFamily: "'Playfair Display', serif",
-            fontStyle: "italic", fontWeight: 400,
-            fontSize: "clamp(2rem,5vw,4rem)",
-            color: "rgba(255,255,255,0.8)",
-            marginBottom: "1.5rem",
-          }}>
-            Pricing
-          </p>
           <p style={{
             fontSize: "clamp(0.95rem,1.5vw,1.05rem)",
             color: "rgba(255,255,255,0.6)", lineHeight: 1.7,
@@ -94,7 +78,7 @@ export default function ServicesPage() {
             borderBottom: "1px solid rgba(59,130,246,0.3)",
           }}>
             <span>Grade</span>
-            <span>Monthly (8 hrs/month)</span>
+            <span>Monthly Subscription: 2 hrs/week (4 sessions)</span>
             <span>Per Lesson (2 hrs)</span>
           </div>
 
@@ -126,7 +110,7 @@ export default function ServicesPage() {
             color: "rgba(255,255,255,0.4)",
             fontStyle: "italic",
           }}>
-            * All sessions follow the CAPS curriculum. Prices are in South African Rand (ZAR).
+            * CAPS and IEB
           </p>
         </div>
       </section>
@@ -137,14 +121,6 @@ export default function ServicesPage() {
         padding: "clamp(4rem,8vw,6rem) clamp(1.5rem,6vw,5rem)",
       }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <div style={{
-            fontFamily: "'Barlow Condensed', sans-serif",
-            fontWeight: 700, fontSize: "0.72rem",
-            letterSpacing: "0.2em", textTransform: "uppercase",
-            color: "#2563b8", marginBottom: "0.5rem",
-          }}>
-            Every Session Includes
-          </div>
           <h2 style={{
             fontFamily: "'Barlow Condensed', sans-serif",
             fontWeight: 900,

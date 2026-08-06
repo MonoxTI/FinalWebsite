@@ -36,12 +36,27 @@ UserSchema.methods.hasAccess = function () {
   return ["user", "admin"].includes(this.role);
 };
 
-/* ─── Appointment Schema ──────────────────────── */
+/* ─── Appointment Schema ──────────────────────── 
+   fullName / email / phoneNumber = PARENT contact details
+   childName / grade / school     = CHILD (student) details
+   curriculum                     = "CAPS" or "IEB"
+   subjects                       = array of subjects needed
+   serviceType                    = "Monthly Subscription" or "Single Lesson"
+   notes                          = additional notes from the booking form
+   chapters                       = legacy field, kept optional so
+                                     old bookings still render correctly */
 const AppointmentSchema = new Schema({
-  fullName:    { type: String, required: true },
-  email:       { type: String, required: true, lowercase: true, trim: true },
-  phoneNumber: { type: String, required: true },
-  chapters:    { type: String, required: true },
+  fullName:    { type: String, required: true },   // Parent full name
+  email:       { type: String, required: true, lowercase: true, trim: true }, // Parent email
+  phoneNumber: { type: String, required: true },   // Parent phone number
+  childName:   { type: String, required: true },   // Child / student full name
+  school:      { type: String, trim: true, default: "" }, // Child's current school
+  grade:       { type: String, required: true },   // Child's grade (e.g. "Grade 10")
+  curriculum:  { type: String, enum: ["CAPS", "IEB", ""], default: "" },
+  subjects:    { type: [String], default: [] },     // e.g. ["Mathematics", "Physical Sciences"]
+  serviceType: { type: String, enum: ["Monthly Subscription", "Single Lesson", ""], default: "" },
+  notes:       { type: String, trim: true, default: "" }, // Additional notes
+  chapters:    { type: String, default: "" },       // legacy — optional now
 }, { timestamps: true });
 
 /* ─── Appointment Details Schema ──────────────── */

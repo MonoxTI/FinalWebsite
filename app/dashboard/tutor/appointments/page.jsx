@@ -15,6 +15,17 @@ function parseChapters(str) {
   return { paper: paper?.trim() || "", chapters }
 }
 
+// ── Small pill/badge used for school, curriculum, subjects, service ──
+function badgeStyle(color, bg, border) {
+  return {
+    display: "inline-block",
+    fontSize: "0.72rem", fontWeight: 700,
+    color, background: bg,
+    border: `1px solid ${border}`,
+    borderRadius: 20, padding: "0.2rem 0.65rem",
+  }
+}
+
 export default function AllAppointmentsPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useAuth()
@@ -143,11 +154,50 @@ export default function AllAppointmentsPage() {
                         fontFamily: "'Barlow Condensed', sans-serif",
                         fontWeight: 800, fontSize: "1.1rem", color: "#0a1628",
                       }}>
-                        {apt.fullName}
+                        {apt.childName || apt.fullName}
+                        {apt.grade && (
+                          <span style={{
+                            marginLeft: "0.6rem",
+                            fontSize: "0.72rem", fontWeight: 700,
+                            color: "#1d4ed8", background: "#eff6ff",
+                            border: "1px solid #bfdbfe",
+                            borderRadius: 20, padding: "0.15rem 0.6rem",
+                            textTransform: "none", letterSpacing: 0,
+                          }}>
+                            {apt.grade}
+                          </span>
+                        )}
                       </div>
                       <div style={{ fontSize: "0.85rem", color: "#6b7280", marginTop: 2 }}>
-                        {apt.email} · {apt.phoneNumber}
+                        Parent: {apt.fullName} · {apt.email} · {apt.phoneNumber}
                       </div>
+                      {(apt.school || apt.curriculum || apt.serviceType || (apt.subjects && apt.subjects.length > 0)) && (
+                        <div style={{
+                          display: "flex", flexWrap: "wrap", gap: "0.4rem",
+                          marginTop: "0.6rem",
+                        }}>
+                          {apt.school && (
+                            <span style={badgeStyle("#374151", "#f3f4f6", "#e5e7eb")}>
+                              🏫 {apt.school}
+                            </span>
+                          )}
+                          {apt.curriculum && (
+                            <span style={badgeStyle("#7c3aed", "#f5f3ff", "#ddd6fe")}>
+                              {apt.curriculum}
+                            </span>
+                          )}
+                          {apt.serviceType && (
+                            <span style={badgeStyle("#0f766e", "#f0fdfa", "#99f6e4")}>
+                              {apt.serviceType}
+                            </span>
+                          )}
+                          {apt.subjects?.map((s) => (
+                            <span key={s} style={badgeStyle("#b45309", "#fffbeb", "#fde68a")}>
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <div style={{ fontSize: "0.78rem", color: "#9ca3af" }}>
                       {new Date(apt.createdAt).toLocaleDateString("en-ZA", {
@@ -156,7 +206,32 @@ export default function AllAppointmentsPage() {
                     </div>
                   </div>
 
-                  {/* Chapters */}
+                  {/* Notes (new bookings) */}
+                  {apt.notes && (
+                    <div style={{
+                      borderTop: "1px solid #f3f4f6",
+                      paddingTop: "1rem", marginBottom: chapters.length > 0 || paper ? "1rem" : 0,
+                    }}>
+                      <div style={{
+                        fontFamily: "'Barlow Condensed', sans-serif",
+                        fontWeight: 700, fontSize: "0.7rem",
+                        letterSpacing: "0.12em", textTransform: "uppercase",
+                        color: "#6b7280", marginBottom: "0.5rem",
+                      }}>
+                        📝 Additional Notes
+                      </div>
+                      <div style={{
+                        background: "#f9fafb", border: "1px solid #e5e7eb",
+                        borderRadius: 4, padding: "0.65rem 0.85rem",
+                        fontSize: "0.875rem", color: "#374151",
+                      }}>
+                        {apt.notes}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Chapters (legacy field — only shown if present) */}
+                  {apt.chapters && (
                   <div style={{
                     borderTop: "1px solid #f3f4f6",
                     paddingTop: "1rem",
@@ -202,6 +277,7 @@ export default function AllAppointmentsPage() {
                       )}
                     </div>
                   </div>
+                  )}
                 </div>
               )
             })}

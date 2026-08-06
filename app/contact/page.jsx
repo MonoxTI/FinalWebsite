@@ -8,7 +8,7 @@ export default function ContactPage() {
     { label: "Email", value: "assembledtutoring@gmail.com", icon: "✉️" },
     { label: "Phone", value: "084 727 7408", icon: "📞" },
     { label: "Location", value: "Montana Tuine, Pretoria, Gauteng, 0182", icon: "📍" },
-    { label: "Hours", value: "Mon–Fri: 07:00–19:00 | Sat: 08:00–14:00", icon: "🕐" },
+    { label: "Hours", value: "Monday to Friday: 08:00 AM – 04:00 PM", icon: "🕐" },
   ]
 
   return (
@@ -31,16 +31,11 @@ export default function ContactPage() {
           Get In Touch
         </div>
         <h1 style={{
-          fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 900,
-          fontSize: "clamp(2.5rem,6vw,4.5rem)",
+          fontSize: "clamp(1.8rem,6vw,4.5rem)",
           lineHeight: 0.95, letterSpacing: "-0.02em",
         }}>
-          CONTACT<br />
-          <span style={{
-            fontFamily: "'Playfair Display', serif",
-            fontStyle: "italic", fontWeight: 400,
-          }}>Us</span>
+          CONTACT US
         </h1>
       </div>
 

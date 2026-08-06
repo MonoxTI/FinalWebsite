@@ -7,6 +7,7 @@ export default function TutorDashboard() {
   const router = useRouter()
   const { user, loading } = useAuth()
   const [count, setCount] = useState(0)
+  const [newCount, setNewCount] = useState(0)
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState("")
 
@@ -21,7 +22,16 @@ export default function TutorDashboard() {
         })
         const data = await res.json()
         if (!res.ok) throw new Error(data.message)
-        setCount(data.data?.length || 0)
+        const list = data.data || []
+        setCount(list.length)
+
+        // ── Dashboard alert: appointments created since last visit ──
+        const lastVisit = localStorage.getItem("lastAppointmentsVisit")
+        const lastVisitTime = lastVisit ? new Date(lastVisit).getTime() : 0
+        const unseen = list.filter(
+          (a) => new Date(a.createdAt).getTime() > lastVisitTime
+        ).length
+        setNewCount(unseen)
       } catch (err) {
         setError("Could not load appointment data")
       } finally {
@@ -32,6 +42,11 @@ export default function TutorDashboard() {
     fetchCount()
   }, [user])
 
+  const goToAppointments = () => {
+    localStorage.setItem("lastAppointmentsVisit", new Date().toISOString())
+    router.push("/dashboard/tutor/appointments")
+  }
+
   if (loading) return <LoadingScreen />
 
   const cards = [
@@ -39,8 +54,9 @@ export default function TutorDashboard() {
       label: "View All Appointments",
       desc: "See the complete list of booked sessions",
       icon: "📋",
-      onClick: () => router.push("/dashboard/tutor/appointments"),
+      onClick: goToAppointments,
       color: "#2563b8",
+      badge: newCount > 0 ? newCount : null,
     },
     {
       label: "Appointment Details",
@@ -114,7 +130,7 @@ export default function TutorDashboard() {
           gap: "1.25rem",
           marginBottom: "2rem",
         }}>
-          {cards.map(({ label, desc, icon, onClick, color }) => (
+          {cards.map(({ label, desc, icon, onClick, color, badge }) => (
             <button
               key={label}
               onClick={onClick}
@@ -125,6 +141,7 @@ export default function TutorDashboard() {
                 padding: "1.5rem",
                 textAlign: "left",
                 cursor: "pointer",
+                position: "relative",
                 transition: "box-shadow 0.2s, transform 0.15s",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
               }}
@@ -137,6 +154,17 @@ export default function TutorDashboard() {
                 e.currentTarget.style.transform = "translateY(0)"
               }}
             >
+              {badge && (
+                <span style={{
+                  position: "absolute", top: "0.85rem", right: "0.85rem",
+                  background: "#ef4444", color: "#fff",
+                  fontFamily: "'Barlow Condensed', sans-serif",
+                  fontWeight: 800, fontSize: "0.7rem",
+                  borderRadius: 20, padding: "0.15rem 0.55rem",
+                }}>
+                  {badge} NEW
+                </span>
+              )}
               <div style={{
                 width: 44, height: 44, borderRadius: 8,
                 background: "#eff6ff",

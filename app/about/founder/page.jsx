@@ -27,18 +27,11 @@ export default function FounderPage() {
           Meet the Team
         </div>
         <h1 style={{
-          fontFamily: "'Barlow Condensed', sans-serif",
           fontWeight: 900,
-          fontSize: "clamp(2.5rem,7vw,5.5rem)",
+          fontSize: "clamp(1.8rem,6vw,5.5rem)",
           lineHeight: 0.95, textTransform: "uppercase",
         }}>
-          ABOUT<br />
-          <span style={{
-            fontFamily: "'Playfair Display', serif",
-            fontStyle: "italic", fontWeight: 400,
-          }}>
-            Founder
-          </span>
+          ABOUT FOUNDER
         </h1>
       </div>
 
@@ -49,14 +42,15 @@ export default function FounderPage() {
         <div style={{
           maxWidth: 1000, margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "4rem", alignItems: "start",
+          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))",
+          gap: "3rem", alignItems: "start",
         }}>
           <div>
             <p style={{
               fontSize: "clamp(0.95rem,1.5vw,1.1rem)",
               lineHeight: 1.8, color: "#374151",
               marginBottom: "1.5rem",
+              textAlign: "justify",
             }}>
               A proud alumna of Pretoria High School for Girls, a BCom Law and LLB
               graduate from the University of Pretoria. She aspires to become an
@@ -67,6 +61,7 @@ export default function FounderPage() {
             <p style={{
               fontSize: "clamp(0.95rem,1.5vw,1.1rem)",
               lineHeight: 1.8, color: "#374151",
+              textAlign: "justify",
             }}>
               She strongly upholds the ethos of rewiring, instilling confidence and
               unlocking the capability of any learner, especially those deemed

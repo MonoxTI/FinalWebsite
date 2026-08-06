@@ -35,6 +35,13 @@ export async function GET(req, { params }) {
         fullName: appointment.fullName,
         email: appointment.email,
         phoneNumber: appointment.phoneNumber,
+        childName: appointment.childName || "",
+        school: appointment.school || "",
+        grade: appointment.grade || "",
+        curriculum: appointment.curriculum || "",
+        subjects: appointment.subjects || [],
+        serviceType: appointment.serviceType || "",
+        notes: appointment.notes || "",
         chapters: appointment.chapters || "",
         createdAt: appointment.createdAt,
       },
@@ -132,7 +139,7 @@ export async function PATCH(req, { params }) {
           <div style="font-family:sans-serif;max-width:600px;margin:auto;color:#333">
             <h2 style="color:#16a34a">✅ Payment Received</h2>
             <p>Hello <strong>${appointment.fullName}</strong>,</p>
-            <p>We have received your payment.</p>
+            <p>We have received your payment${appointment.childName ? ` for <strong>${appointment.childName}</strong>'s tutoring sessions` : ""}.</p>
             <table style="width:100%">
               <tr><td><strong>Invoice:</strong></td><td>${invoiceNumber}</td></tr>
               <tr><td><strong>Transaction ID:</strong></td><td>${transactionId}</td></tr>

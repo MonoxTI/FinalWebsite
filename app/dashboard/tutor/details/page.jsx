@@ -53,7 +53,7 @@ export default function AppointmentDetailsPage() {
         console.log("Loaded appointments:", list) // ← debug
 
         setAllAppointments(list)
-        const names = [...new Set(list.map((a) => a.fullName).filter(Boolean))]
+        const names = [...new Set(list.map((a) => a.childName || a.fullName).filter(Boolean))]
         setOptions(names)
       } catch (err) {
         console.error("Failed to load names:", err)
@@ -91,7 +91,7 @@ export default function AppointmentDetailsPage() {
       // ── Find in already-loaded list first ────────────
       // This avoids an extra API call and works offline
       let match = allAppointments.find(
-        (a) => a.fullName?.toLowerCase().trim() === selectedName.toLowerCase().trim()
+        (a) => (a.childName || a.fullName)?.toLowerCase().trim() === selectedName.toLowerCase().trim()
       )
 
       // ── If not in cache, re-fetch ────────────────────
@@ -107,7 +107,7 @@ export default function AppointmentDetailsPage() {
           : []
 
         match = list.find(
-          (a) => a.fullName?.toLowerCase().trim() === selectedName.toLowerCase().trim()
+          (a) => (a.childName || a.fullName)?.toLowerCase().trim() === selectedName.toLowerCase().trim()
         )
       }
 
@@ -271,7 +271,7 @@ export default function AppointmentDetailsPage() {
             textTransform: "uppercase", color: "#0a1628",
             marginBottom: "1.25rem",
           }}>
-            Search by Student Name
+            Search by Child's Name
           </h2>
 
           <form onSubmit={handleSearch} style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
@@ -295,7 +295,7 @@ export default function AppointmentDetailsPage() {
                   type="text"
                   value={selectedName}
                   onChange={(e) => setSelectedName(e.target.value)}
-                  placeholder="Type student full name exactly..."
+                  placeholder="Type the child's full name exactly..."
                   required
                   style={inputStyle}
                 />
@@ -364,9 +364,15 @@ export default function AppointmentDetailsPage() {
                 gap: "0.85rem",
               }}>
                 {[
-                  ["Student", data.appointment.fullName],
-                  ["Email",   data.appointment.email],
-                  ["Phone",   data.appointment.phoneNumber],
+                  ["Child Name", data.appointment.childName || "—"],
+                  ["School", data.appointment.school || "—"],
+                  ["Grade",      data.appointment.grade || "—"],
+                  ["Curriculum", data.appointment.curriculum || "—"],
+                  ["Service",    data.appointment.serviceType || "—"],
+                  ["Subjects",   data.appointment.subjects?.length ? data.appointment.subjects.join(", ") : "—"],
+                  ["Parent Name", data.appointment.fullName],
+                  ["Parent Email",   data.appointment.email],
+                  ["Parent Phone",   data.appointment.phoneNumber],
                 ].map(([label, val]) => (
                   <div key={label}>
                     <div style={labelStyle}>{label}</div>
@@ -374,6 +380,22 @@ export default function AppointmentDetailsPage() {
                   </div>
                 ))}
               </div>
+
+              {data.appointment.notes && (
+                <div style={{
+                  marginTop: "1.25rem", paddingTop: "1rem",
+                  borderTop: "1px solid #f3f4f6",
+                }}>
+                  <div style={labelStyle}>📝 Additional Notes</div>
+                  <div style={{
+                    background: "#f9fafb", border: "1px solid #e5e7eb",
+                    borderRadius: 4, padding: "0.65rem 0.85rem",
+                    fontSize: "0.875rem", color: "#374151",
+                  }}>
+                    {data.appointment.notes}
+                  </div>
+                </div>
+              )}
 
               {data.appointment.chapters && (() => {
                 const { paper, chapters } = parseChapters(data.appointment.chapters)
