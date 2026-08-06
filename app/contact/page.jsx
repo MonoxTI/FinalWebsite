@@ -3,11 +3,6 @@ import Link from "next/link"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 
-export const metadata = {
-  title: "Contact Us",
-  description:
-    "Contact Assembled Tutoring in Montana Tuine, Pretoria. Call 084 727 7408 or email assembledtutoring@gmail.com.",
-}
 
 export default function ContactPage() {
   const details = [
