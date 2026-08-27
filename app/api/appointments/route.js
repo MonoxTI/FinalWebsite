@@ -124,6 +124,23 @@ export async function POST(req) {
         console.error("Admin notification email failed:", emailError.message);
       }
     }
+    try {
+  await sendEmail({
+    to: email.trim().toLowerCase(),
+    subject: "Appointment request received",
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:auto;color:#333">
+        <h2>Thank you for your booking request</h2>
+        <p>Hi ${fullName.trim()},</p>
+        <p>We received your appointment request for ${childName.trim()}.</p>
+        <p>Our team will review the details and contact you shortly.</p>
+        <p>Regards,<br>Assembled Tutoring</p>
+      </div>
+    `,
+  });
+} catch (error) {
+  console.error("Parent confirmation email failed:", error.message);
+}
 
     return Response.json(
       { success: true, message: "Appointment created", data: appointment },

@@ -27,14 +27,14 @@ export default function ServicesPage() {
         {/* Logo watermark — resized proportionally (aspect ratio preserved) */}
         <div style={{
           position: "absolute", right: "clamp(1rem,5vw,4rem)",
-          top: "50%", transform: "translateY(-50%)",
+          top: "60%", transform: "translateY(-50%)",  
           opacity: 0.07, pointerEvents: "none",
           maxWidth: "45vw",
         }}>
           <img
             src="/images/LOGO.png"
             alt=""
-            style={{ height: "clamp(200px,35vw,500px)", width: "auto", maxWidth: "100%", objectFit: "contain" }}
+            style={{ height: "clamp(150px,35vw,300px)", width: "auto", maxWidth: "100%", objectFit: "contain" }}
           />
         </div>
 

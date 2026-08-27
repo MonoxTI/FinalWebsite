@@ -140,7 +140,7 @@ export default function HomePage() {
           display: "flex", gap: "clamp(1.5rem,5vw,3.5rem)",
           alignItems: "center", flexWrap: "wrap",
         }}>
-          <div style={{ flex: "1 1 420px", minWidth: 280 }}>
+          <div style={{ flex: "1 1 420px", minWidth: 280,  marginLeft: "-6rem",}}>
             <h2 style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 900,
@@ -207,9 +207,9 @@ export default function HomePage() {
           gap: "4rem", alignItems: "center",
           maxWidth: 1100,
         }}>
-          <div>
+          <div >
             <h2 style={{
-              fontFamily: "'Barlow Condensed', sans-serif",
+              fontFamily: "Barlow Condensed', sans-serif",
               fontWeight: 900,
               fontSize: "clamp(2rem,5vw,3.5rem)",
               lineHeight: 0.95, textTransform: "uppercase",
@@ -253,8 +253,8 @@ export default function HomePage() {
               <Image
                 src="/images/pic1.png"
                 alt="Founder of Assembled Tutoring"
-                width={400}
-                height={320}
+                width={325}
+                height={285}
                 priority
                 style={{ objectFit: "contain", borderRadius: 8 }}
               />

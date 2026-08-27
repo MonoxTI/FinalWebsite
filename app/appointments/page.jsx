@@ -202,7 +202,7 @@ export default function AppointmentsPage() {
               <div style={sectionLabelStyle}>Parent Details</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
                 <div>
-                  <label style={labelStyle}>Parent Full Name</label>
+                  <label style={labelStyle}>Full Name</label>
                   <input
                     type="text"
                     name="fullName"
@@ -214,7 +214,7 @@ export default function AppointmentsPage() {
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Parent Email</label>
+                  <label style={labelStyle}>Email</label>
                   <input
                     type="email"
                     name="email"
@@ -226,7 +226,7 @@ export default function AppointmentsPage() {
                   />
                 </div>
                 <div>
-                  <label style={labelStyle}>Parent Phone Number</label>
+                  <label style={labelStyle}>Phone Number</label>
                   <input
                     type="tel"
                     name="phoneNumber"
@@ -245,7 +245,7 @@ export default function AppointmentsPage() {
               <div style={sectionLabelStyle}>Child Details</div>
               <div style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
                 <div>
-                  <label style={labelStyle}>Child Full Name</label>
+                  <label style={labelStyle}>Full Name</label>
                   <input
                     type="text"
                     name="childName"
@@ -411,7 +411,7 @@ export default function AppointmentsPage() {
                 marginTop: "0.5rem",
               }}
             >
-              {loading ? "BOOKING..." : "CONFIRM BOOKING →"}
+              {loading ? "BOOKING..." : "Submit →"}
             </button>
           </form>
         </div>
