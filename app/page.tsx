@@ -140,7 +140,8 @@ export default function HomePage() {
           display: "flex", gap: "clamp(1.5rem,5vw,3.5rem)",
           alignItems: "center", flexWrap: "wrap",
         }}>
-          <div style={{ flex: "1 1 420px", minWidth: 280,  marginLeft: "-6rem",}}>
+          {/* Removed marginLeft: "-6rem" to align properly */}
+          <div style={{ flex: "1 1 420px", minWidth: 280 }}>
             <h2 style={{
               fontFamily: "'Barlow Condensed', sans-serif",
               fontWeight: 900,
@@ -200,16 +201,17 @@ export default function HomePage() {
         color: "#fff",
         padding: "clamp(4rem,8vw,7rem) clamp(1.5rem,6vw,5rem)",
       }}>
-        {/* ⬇️ Responsive grid: stacks on mobile, 2-col on tablet+ */}
+        {/* ⬇️ Added margin: "0 auto" to perfectly match Section 2's container alignment */}
         <div className="grid-responsive" style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))",
           gap: "4rem", alignItems: "center",
           maxWidth: 1100,
+          margin: "0 auto",
         }}>
           <div >
             <h2 style={{
-              fontFamily: "Barlow Condensed', sans-serif",
+              fontFamily: "'Barlow Condensed', sans-serif", // Fixed missing opening quote
               fontWeight: 900,
               fontSize: "clamp(2rem,5vw,3.5rem)",
               lineHeight: 0.95, textTransform: "uppercase",
@@ -242,36 +244,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1.5rem" }}>
-            <div style={{
-              background: "rgba(0,0,0,0.3)",
-              backdropFilter: "blur(8px)",
-              borderRadius: 12, padding: 8,
-              border: "1px solid rgba(59,130,246,0.2)",
-            }}>
-              {/* ⬆️ Optimized with next/image for automatic WebP/AVIF, lazy loading & sizing */}
-              <Image
-                src="/images/pic1.png"
-                alt="Founder of Assembled Tutoring"
-                width={325}
-                height={285}
-                priority
-                style={{ objectFit: "contain", borderRadius: 8 }}
-              />
-            </div>
-            <blockquote style={{
-              textAlign: "center",
-              fontStyle: "italic",
-              color: "rgba(147,197,253,0.9)",
-              borderLeft: "3px solid #60a5fa",
-              paddingLeft: "1rem",
-              fontSize: "0.9rem", lineHeight: 1.6,
-              maxWidth: 320,
-            }}>
-              "Mathematics is a language that requires understanding the fundamentals
-              & the underlying basics of all its topics."
-            </blockquote>
-          </div>
+         
         </div>
       </section>
 

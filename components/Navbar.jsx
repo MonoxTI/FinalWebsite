@@ -81,7 +81,7 @@ export default function Navbar() {
 
   const ABOUT_ITEMS = [
     { href: "/about/mission", label: "Mission", },
-    { href: "/about/founder", label: "Founder", },
+    //{ href: "/about/founder", label: "Founder", },
   ]
 
   return (
